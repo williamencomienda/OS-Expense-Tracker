@@ -12,18 +12,27 @@ public class AppDbContext : DbContext
         : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<Expense>(entity =>
     {
-        modelBuilder.Entity<Expense>()
-            .Property(e => e.Amount)
-            .HasColumnType("decimal(18,2)");
+        entity.Property(e => e.Amount)
+              .HasColumnType("decimal(18,2)");
 
-        modelBuilder.Entity<Expense>()
-            .HasOne(e => e.Category)
-            .WithMany(c => c.Expenses)
-            .HasForeignKey(e => e.CategoryId);
+        entity.HasOne(e => e.Category)
+              .WithMany(c => c.Expenses)
+              .HasForeignKey(e => e.CategoryId);
+    });
 
-        modelBuilder.Entity<Income>()
-            .Property(i => i.Amount)
-            .HasColumnType("decimal(18,2)");
-    }
+    modelBuilder.Entity<Category>(entity =>
+    {
+        entity.Property(c => c.MonthlyBudget)
+              .HasColumnType("decimal(18,2)");
+    });
+
+    modelBuilder.Entity<Income>(entity =>
+    {
+        entity.Property(i => i.Amount)
+              .HasColumnType("decimal(18,2)");
+    });
+}
 }
