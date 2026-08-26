@@ -343,4 +343,8 @@ public class TransactionsViewModel : ViewModelBase
         FilteredTransactions.Clear();
         foreach (var t in query) FilteredTransactions.Add(t);
     }
+
+    // Updates dashboard analytics when new transaction is added
+    public event Action? DataChanged;
+    
 }
