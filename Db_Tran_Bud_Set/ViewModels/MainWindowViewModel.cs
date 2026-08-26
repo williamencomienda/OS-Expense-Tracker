@@ -29,7 +29,7 @@ public class MainWindowViewModel : ViewModelBase
     // "dashboard" and "transactions" have real pages. "budget"/"settings" aren't built yet -
     // they fall back to showing the dashboard for now.
     public DashboardViewModel Dashboard { get; }
-    public TransactionsViewModel Transactions { get; } = new();
+    public TransactionsViewModel Transactions { get; }
     public BudgetViewModel Budget { get; } = new();
     public SettingsViewModel Settings { get; } = new();
 
@@ -41,9 +41,10 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     // Dashboard is now injected via DI instead of being created with "new"
-    public MainWindowViewModel(DashboardViewModel dashboardViewModel)
+    public MainWindowViewModel(DashboardViewModel dashboardViewModel, TransactionsViewModel transactionsViewModel)
     {
         Dashboard = dashboardViewModel;
+        Transactions = transactionsViewModel;
 
         _currentPage = Dashboard;
         SelectedNavItem = NavItems[0];

@@ -53,6 +53,7 @@ public partial class App : Application
         services.AddScoped<IIncomeRepository, IncomeRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IBudgetService, BudgetCalculationService>();
+        services.AddTransient<TransactionsViewModel>();
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<MainWindowViewModel>();

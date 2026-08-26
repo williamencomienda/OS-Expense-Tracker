@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using GCAT.Models;
+using CoreModels = ExpenseTracker.Core.Models;
+using ExpenseTracker.Core.Interfaces;
 
 namespace GCAT.ViewModels;
 
@@ -16,10 +19,14 @@ public class TransactionsViewModel : ViewModelBase
 
     public static readonly string[] Accounts = { "Bank Savings", "GCash", "Credit Card", "Cash" };
 
+    private readonly IExpenseRepository _expenseRepository;
+    private readonly IIncomeRepository _incomeRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private List<CoreModels.Category> _categoriesCache = new();
+
     public ObservableCollection<Transaction> AllTransactions { get; } = new();
     public ObservableCollection<Transaction> FilteredTransactions { get; } = new();
 
-    // ----- Header -----
     private string _headerMonthLabel = "August 2026";
     public string HeaderMonthLabel
     {
@@ -27,10 +34,8 @@ public class TransactionsViewModel : ViewModelBase
         set => SetField(ref _headerMonthLabel, value);
     }
 
-    // ----- Summary cards (placeholders, matches image 1) -----
-    public ObservableCollection<SummaryCard> SummaryCards { get; }
+    public ObservableCollection<SummaryCard> SummaryCards { get; } = new();
 
-    // ----- Search + quick filters -----
     private string _searchText = string.Empty;
     public string SearchText
     {
@@ -56,7 +61,6 @@ public class TransactionsViewModel : ViewModelBase
         set => SetField(ref _accountFilterLabel, value);
     }
 
-    // ----- Popup host - exactly one of these object instances is "active" at a time -----
     private object? _activePopup;
     public object? ActivePopup
     {
@@ -80,18 +84,15 @@ public class TransactionsViewModel : ViewModelBase
     private readonly MonthPickerViewModel _monthPicker;
     private readonly FiltersViewModel _filters;
 
-    public TransactionsViewModel()
+    public TransactionsViewModel(
+        IExpenseRepository expenseRepository,
+        IIncomeRepository incomeRepository,
+        ICategoryRepository categoryRepository)
     {
-        SummaryCards = new ObservableCollection<SummaryCard>
-        {
-            new() { Title = "net savings", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = true },
-            new() { Title = "total income", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = false },
-            new() { Title = "total expenses", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = true },
-        };
+        _expenseRepository = expenseRepository;
+        _incomeRepository = incomeRepository;
+        _categoryRepository = categoryRepository;
 
-        SeedPlaceholderData();
-
-        // The header month picker reuses the exact same control/view model as the Dashboard.
         _monthPicker = new MonthPickerViewModel(2026, 8);
         _monthPicker.MonthChosen += (year, month) =>
         {
@@ -113,8 +114,59 @@ public class TransactionsViewModel : ViewModelBase
         OpenAccountFilterCommand = new RelayCommand(_ => OpenAccountFilter());
         OpenFiltersCommand = new RelayCommand(_ => ActivePopup = _filters);
         ClosePopupCommand = new RelayCommand(_ => ActivePopup = null);
+    }
+
+    // Call this right after construction (constructors can't be async)
+    public async Task LoadTransactionsAsync()
+    {
+        var expenses = await _expenseRepository.GetAllAsync();
+        var income = await _incomeRepository.GetAllAsync();
+        _categoriesCache = await _categoryRepository.GetAllAsync();
+
+        AllTransactions.Clear();
+
+        foreach (var e in expenses)
+        {
+            var t = new Transaction
+            {
+                DbId = e.Id,
+                Date = e.Date,
+                Description = e.Description,
+                Category = e.Category?.Name ?? "Uncategorized",
+                Account = "Unknown", // TODO: no Account concept in DB yet
+                IsIncome = false,
+                Amount = e.Amount,
+                CategoryBrush = CategoryPalette.BrushFor(e.Category?.Name ?? "Uncategorized"),
+            };
+            WireRowCommands(t);
+            AllTransactions.Add(t);
+        }
+
+        foreach (var i in income)
+        {
+            var t = new Transaction
+            {
+                DbId = i.Id,
+                Date = i.Date,
+                Description = i.Source,
+                Category = "income",
+                Account = "Unknown",
+                IsIncome = true,
+                Amount = i.Amount,
+                CategoryBrush = CategoryPalette.BrushFor("income"),
+            };
+            WireRowCommands(t);
+            AllTransactions.Add(t);
+        }
 
         RecomputeFilteredTransactions();
+
+        var totalIncome = income.Sum(x => x.Amount);
+        var totalExpenses = expenses.Sum(x => x.Amount);
+        SummaryCards.Clear();
+        SummaryCards.Add(new SummaryCard { Title = "net savings", Amount = totalIncome - totalExpenses, ChangePercent = 0, IsPositiveChange = true });
+        SummaryCards.Add(new SummaryCard { Title = "total income", Amount = totalIncome, ChangePercent = 0, IsPositiveChange = true });
+        SummaryCards.Add(new SummaryCard { Title = "total expenses", Amount = totalExpenses, ChangePercent = 0, IsPositiveChange = false });
     }
 
     private void OpenTypeFilter()
@@ -159,19 +211,86 @@ public class TransactionsViewModel : ViewModelBase
         ActivePopup = form;
     }
 
-    private void OnTransactionSubmitted(Transaction transaction)
+    private async void OnTransactionSubmitted(Transaction transaction)
     {
-        if (!AllTransactions.Contains(transaction))
+        var isEditing = AllTransactions.Any(t => t.Id == transaction.Id);
+
+        if (transaction.IsIncome)
         {
-            WireRowCommands(transaction);
-            AllTransactions.Insert(0, transaction);
+            if (isEditing)
+            {
+                var income = await _incomeRepository.GetByIdAsync(transaction.DbId);
+                if (income != null)
+                {
+                    income.Amount = transaction.Amount;
+                    income.Source = transaction.Description;
+                    income.Date = transaction.Date;
+                    await _incomeRepository.UpdateAsync(income);
+                }
+            }
+            else
+            {
+                var income = new CoreModels.Income
+                {
+                    Amount = transaction.Amount,
+                    Source = transaction.Description,
+                    Date = transaction.Date
+                };
+                await _incomeRepository.AddAsync(income);
+            }
+        }
+        else
+        {
+            var category = await GetOrCreateCategoryAsync(transaction.Category);
+
+            if (isEditing)
+            {
+                var expense = await _expenseRepository.GetByIdAsync(transaction.DbId);
+                if (expense != null)
+                {
+                    expense.Amount = transaction.Amount;
+                    expense.Description = transaction.Description;
+                    expense.Date = transaction.Date;
+                    expense.CategoryId = category.Id;
+                    await _expenseRepository.UpdateAsync(expense);
+                }
+            }
+            else
+            {
+                var expense = new CoreModels.Expense
+                {
+                    Amount = transaction.Amount,
+                    Description = transaction.Description,
+                    Date = transaction.Date,
+                    CategoryId = category.Id
+                };
+                await _expenseRepository.AddAsync(expense);
+            }
         }
 
-        RecomputeFilteredTransactions();
+        await LoadTransactionsAsync();
     }
 
-    private void RemoveTransaction(Transaction transaction)
+    private async Task<CoreModels.Category> GetOrCreateCategoryAsync(string categoryName)
     {
+        var existing = _categoriesCache.FirstOrDefault(c =>
+            c.Name.Equals(categoryName, StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null) return existing;
+
+        var newCategory = new CoreModels.Category { Name = categoryName };
+        await _categoryRepository.AddAsync(newCategory);
+        _categoriesCache.Add(newCategory);
+        return newCategory;
+    }
+
+    private async void RemoveTransaction(Transaction transaction)
+    {
+        if (transaction.IsIncome)
+            await _incomeRepository.DeleteAsync(transaction.DbId);
+        else
+            await _expenseRepository.DeleteAsync(transaction.DbId);
+
         AllTransactions.Remove(transaction);
         RecomputeFilteredTransactions();
     }
@@ -223,33 +342,5 @@ public class TransactionsViewModel : ViewModelBase
 
         FilteredTransactions.Clear();
         foreach (var t in query) FilteredTransactions.Add(t);
-    }
-
-    private void SeedPlaceholderData()
-    {
-        void Add(DateTime date, string description, string category, string account, bool isIncome, decimal amount)
-        {
-            var t = new Transaction
-            {
-                Date = date,
-                Description = description,
-                Category = category,
-                Account = account,
-                IsIncome = isIncome,
-                Amount = amount,
-                CategoryBrush = CategoryPalette.BrushFor(category),
-            };
-            WireRowCommands(t);
-            AllTransactions.Add(t);
-        }
-
-        var d = new DateTime(2026, 8, 1);
-        Add(d, "Salary", "income", "Bank Savings", true, 100000m);
-        Add(d, "Salary", "income", "GCash", true, 100000m);
-        Add(d, "Groceries", "food", "GCash", false, 5000m);
-        Add(d, "Transportation", "transport", "GCash", false, 100m);
-        Add(d, "Online Shopping", "shopping", "Credit Card", false, 15000m);
-        Add(d.AddDays(-2), "Electric Bill", "utilities", "Bank Savings", false, 3200m);
-        Add(d.AddDays(-3), "Movie Night", "entertainment", "Cash", false, 900m);
     }
 }

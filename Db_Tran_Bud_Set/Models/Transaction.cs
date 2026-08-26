@@ -8,6 +8,7 @@ namespace GCAT.Models;
 // TransactionItem since this page needs account/category/type columns and row actions.
 public class Transaction
 {
+    public int DbId { get; set; }
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime Date { get; set; }
     public string Description { get; set; } = string.Empty;

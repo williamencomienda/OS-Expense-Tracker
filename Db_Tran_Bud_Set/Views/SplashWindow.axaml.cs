@@ -29,8 +29,9 @@ public partial class SplashWindow : Window
         // Resolve the MainWindowViewModel (and its DashboardViewModel dependency) via DI
         var mainWindowViewModel = App.Services.GetRequiredService<MainWindowViewModel>();
 
-        // Load real data into the dashboard before showing it
+        // Load real data into both pages before showing the window
         await mainWindowViewModel.Dashboard.LoadDashboardDataAsync();
+        await mainWindowViewModel.Transactions.LoadTransactionsAsync();
 
         var main = new MainWindow
         {
