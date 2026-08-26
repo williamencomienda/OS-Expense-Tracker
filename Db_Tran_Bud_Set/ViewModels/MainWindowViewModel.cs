@@ -5,7 +5,6 @@ namespace GCAT.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    // The actual G-CAT mascot/logo shown beside the "G-CAT" wordmark in the sidebar header.
     public string AppIconPath => "Assets/Icons/app-icon.png";
 
     public ObservableCollection<NavItem> NavItems { get; } = new()
@@ -29,7 +28,7 @@ public class MainWindowViewModel : ViewModelBase
 
     // "dashboard" and "transactions" have real pages. "budget"/"settings" aren't built yet -
     // they fall back to showing the dashboard for now.
-    public DashboardViewModel Dashboard { get; } = new();
+    public DashboardViewModel Dashboard { get; }
     public TransactionsViewModel Transactions { get; } = new();
     public BudgetViewModel Budget { get; } = new();
     public SettingsViewModel Settings { get; } = new();
@@ -41,8 +40,11 @@ public class MainWindowViewModel : ViewModelBase
         private set => SetField(ref _currentPage, value);
     }
 
-    public MainWindowViewModel()
+    // Dashboard is now injected via DI instead of being created with "new"
+    public MainWindowViewModel(DashboardViewModel dashboardViewModel)
     {
+        Dashboard = dashboardViewModel;
+
         _currentPage = Dashboard;
         SelectedNavItem = NavItems[0];
     }

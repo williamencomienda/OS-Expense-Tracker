@@ -55,6 +55,7 @@ public partial class App : Application
         services.AddScoped<IBudgetService, BudgetCalculationService>();
 
         services.AddTransient<DashboardViewModel>();
+        services.AddTransient<MainWindowViewModel>();
         // Add other ViewModels here as they get converted to use DI
     }
 }

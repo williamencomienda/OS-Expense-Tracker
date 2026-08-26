@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using GCAT.ViewModels;
 
 namespace GCAT.Views;
 
 public partial class SplashWindow : Window
 {
-    // Bound by the Image in SplashWindow.axaml. Drop app-icon.png into Assets/Icons.
     public string IconPath => "Assets/Icons/app-icon.png";
 
     public SplashWindow()
@@ -17,17 +18,24 @@ public partial class SplashWindow : Window
 
     private async Task RunSplashSequenceAsync()
     {
-        // Small delay so the transition (defined in XAML) actually animates rather
-        // than snapping straight to Opacity=1 on first layout pass.
         await Task.Delay(100);
         RootPanel.Opacity = 1;
 
-        await Task.Delay(1600); // hold on screen
+        await Task.Delay(1600);
 
-        RootPanel.Opacity = 0; // fade out
+        RootPanel.Opacity = 0;
         await Task.Delay(700);
 
-        var main = new MainWindow();
+        // Resolve the MainWindowViewModel (and its DashboardViewModel dependency) via DI
+        var mainWindowViewModel = App.Services.GetRequiredService<MainWindowViewModel>();
+
+        // Load real data into the dashboard before showing it
+        await mainWindowViewModel.Dashboard.LoadDashboardDataAsync();
+
+        var main = new MainWindow
+        {
+            DataContext = mainWindowViewModel
+        };
         main.Show();
         Close();
     }

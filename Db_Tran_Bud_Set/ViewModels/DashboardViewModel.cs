@@ -1,12 +1,14 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Media;
 using GCAT.Models;
+using CoreModels = ExpenseTracker.Core.Models;
+using ExpenseTracker.Core.Interfaces;
 
 namespace GCAT.ViewModels;
 
-// Which button opened the month picker, so we know which label to update when a month is chosen.
 public enum MonthPickerTarget
 {
     None,
@@ -21,6 +23,12 @@ public class DashboardViewModel : ViewModelBase
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     };
+
+    // ----- Injected dependencies -----
+    private readonly IExpenseRepository _expenseRepository;
+    private readonly IIncomeRepository _incomeRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IBudgetService _budgetService;
 
     // ----- Header -----
     private string _headerMonthLabel = "August 2026";
@@ -37,14 +45,18 @@ public class DashboardViewModel : ViewModelBase
         set => SetField(ref _expensesPeriodLabel, value);
     }
 
-    // ----- Placeholder data -----
-    public ObservableCollection<SummaryCard> SummaryCards { get; }
-    public ObservableCollection<ExpenseSlice> ExpensesOverview { get; }
-    public ObservableCollection<MonthlyPoint> IncomeVsExpenses { get; }
-    public ObservableCollection<TransactionItem> RecentTransactions { get; }
-    public ObservableCollection<BudgetItem> BudgetOverview { get; }
+    // ----- Currently selected period -----
+    private int _currentMonth = 8;
+    private int _currentYear = 2026;
 
-    // ----- Month picker popup (image 3) -----
+    // ----- Data collections -----
+    public ObservableCollection<SummaryCard> SummaryCards { get; } = new();
+    public ObservableCollection<ExpenseSlice> ExpensesOverview { get; } = new();
+    public ObservableCollection<MonthlyPoint> IncomeVsExpenses { get; } = new();
+    public ObservableCollection<TransactionItem> RecentTransactions { get; } = new();
+    public ObservableCollection<BudgetItem> BudgetOverview { get; } = new();
+
+    // ----- Month picker popup -----
     private bool _isMonthPickerOpen;
     public bool IsMonthPickerOpen
     {
@@ -65,50 +77,18 @@ public class DashboardViewModel : ViewModelBase
     public RelayCommand OpenExpensesPeriodPickerCommand { get; }
     public RelayCommand ClosePickerCommand { get; }
 
-    public DashboardViewModel()
+    public DashboardViewModel(
+        IExpenseRepository expenseRepository,
+        IIncomeRepository incomeRepository,
+        ICategoryRepository categoryRepository,
+        IBudgetService budgetService)
     {
-        SummaryCards = new ObservableCollection<SummaryCard>
-        {
-            new() { Title = "total balance", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = true },
-            new() { Title = "total income", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = false },
-            new() { Title = "total expenses", Amount = 77777.77m, ChangePercent = 0, IsPositiveChange = true },
-        };
+        _expenseRepository = expenseRepository;
+        _incomeRepository = incomeRepository;
+        _categoryRepository = categoryRepository;
+        _budgetService = budgetService;
 
-        ExpensesOverview = new ObservableCollection<ExpenseSlice>
-        {
-            new() { Category = "Food", Amount = 10000m, Color = new SolidColorBrush(Color.Parse("#FFB0D6")) },
-            new() { Category = "Food", Amount = 10000m, Color = new SolidColorBrush(Color.Parse("#F06FA6")) },
-            new() { Category = "Food", Amount = 10000m, Color = new SolidColorBrush(Color.Parse("#C2185B")) },
-            new() { Category = "Food", Amount = 10000m, Color = new SolidColorBrush(Color.Parse("#7A0E3D")) },
-        };
-        RecalculateSlicePercents();
-
-        IncomeVsExpenses = new ObservableCollection<MonthlyPoint>
-        {
-            new() { Month = "May", Income = 20000, Expenses = 8000 },
-            new() { Month = "June", Income = 22000, Expenses = 9000 },
-            new() { Month = "July", Income = 68000, Expenses = 12000 },
-            new() { Month = "August", Income = 70000, Expenses = 15000 },
-        };
-        RecalculateBarRatios();
-
-        RecentTransactions = new ObservableCollection<TransactionItem>
-        {
-            new() { Category = "food", IconPath = "Assets/Icons/category-food.png", Date = new DateTime(2026, 8, 1), Amount = -10000m },
-            new() { Category = "food", IconPath = "Assets/Icons/category-food.png", Date = new DateTime(2026, 8, 1), Amount = 10000m },
-            new() { Category = "food", IconPath = "Assets/Icons/category-food.png", Date = new DateTime(2026, 8, 1), Amount = -10000m },
-            new() { Category = "food", IconPath = "Assets/Icons/category-food.png", Date = new DateTime(2026, 8, 1), Amount = 10000m },
-        };
-
-        BudgetOverview = new ObservableCollection<BudgetItem>
-        {
-            new() { Category = "food", Spent = 7777, Limit = 8000 },
-            new() { Category = "food", Spent = 7777, Limit = 8000 },
-            new() { Category = "food", Spent = 7777, Limit = 8000 },
-            new() { Category = "food", Spent = 7777, Limit = 8000 },
-        };
-
-        _monthPicker = new MonthPickerViewModel(2026, 8);
+        _monthPicker = new MonthPickerViewModel(_currentYear, _currentMonth);
         _monthPicker.MonthChosen += OnMonthChosen;
 
         OpenHeaderMonthPickerCommand = new RelayCommand(_ => OpenPicker(MonthPickerTarget.Header));
@@ -116,14 +96,148 @@ public class DashboardViewModel : ViewModelBase
         ClosePickerCommand = new RelayCommand(_ => IsMonthPickerOpen = false);
     }
 
+    // Call this right after creating the ViewModel (constructors can't be async)
+    public async Task LoadDashboardDataAsync()
+    {
+        var allExpenses = await _expenseRepository.GetAllAsync();
+        var allIncome = await _incomeRepository.GetAllAsync();
+        var allCategories = await _categoryRepository.GetAllAsync();
+
+        var monthExpenses = allExpenses
+            .Where(e => e.Date.Month == _currentMonth && e.Date.Year == _currentYear)
+            .ToList();
+
+        var monthIncome = allIncome
+            .Where(i => i.Date.Month == _currentMonth && i.Date.Year == _currentYear)
+            .ToList();
+
+        PopulateSummaryCards(monthExpenses, monthIncome, allExpenses, allIncome);
+        PopulateExpensesOverview(monthExpenses);
+        await PopulateIncomeVsExpensesAsync(allExpenses, allIncome);
+        PopulateRecentTransactions(monthExpenses, monthIncome);
+        await PopulateBudgetOverviewAsync(allCategories);
+    }
+
+    // ----- Conversion / mapping logic -----
+
+    private void PopulateSummaryCards(
+        System.Collections.Generic.List<CoreModels.Expense> monthExpenses,
+        System.Collections.Generic.List<CoreModels.Income> monthIncome,
+        System.Collections.Generic.List<CoreModels.Expense> allExpenses,
+        System.Collections.Generic.List<CoreModels.Income> allIncome)
+    {
+        var totalIncome = monthIncome.Sum(i => i.Amount);
+        var totalExpenses = monthExpenses.Sum(e => e.Amount);
+        var balance = allIncome.Sum(i => i.Amount) - allExpenses.Sum(e => e.Amount);
+
+        SummaryCards.Clear();
+        SummaryCards.Add(new SummaryCard { Title = "total balance", Amount = balance, ChangePercent = 0, IsPositiveChange = true });
+        SummaryCards.Add(new SummaryCard { Title = "total income", Amount = totalIncome, ChangePercent = 0, IsPositiveChange = true });
+        SummaryCards.Add(new SummaryCard { Title = "total expenses", Amount = totalExpenses, ChangePercent = 0, IsPositiveChange = false });
+    }
+
+    private void PopulateExpensesOverview(System.Collections.Generic.List<CoreModels.Expense> monthExpenses)
+    {
+        ExpensesOverview.Clear();
+
+        var grouped = monthExpenses
+            .GroupBy(e => e.Category?.Name ?? "Uncategorized")
+            .Select(g => new ExpenseSlice
+            {
+                Category = g.Key,
+                Amount = g.Sum(e => e.Amount),
+                Color = new SolidColorBrush(Color.Parse("#CCCCCC")) // placeholder — colors TODO
+            });
+
+        foreach (var slice in grouped)
+            ExpensesOverview.Add(slice);
+
+        RecalculateSlicePercents();
+    }
+
+    private async Task PopulateIncomeVsExpensesAsync(
+        System.Collections.Generic.List<CoreModels.Expense> allExpenses,
+        System.Collections.Generic.List<CoreModels.Income> allIncome)
+    {
+        IncomeVsExpenses.Clear();
+
+        // Show the current month plus the 3 preceding months
+        for (int i = 3; i >= 0; i--)
+        {
+            var targetDate = new DateTime(_currentYear, _currentMonth, 1).AddMonths(-i);
+
+            var incomeTotal = allIncome
+                .Where(x => x.Date.Month == targetDate.Month && x.Date.Year == targetDate.Year)
+                .Sum(x => x.Amount);
+
+            var expenseTotal = allExpenses
+                .Where(x => x.Date.Month == targetDate.Month && x.Date.Year == targetDate.Year)
+                .Sum(x => x.Amount);
+
+            IncomeVsExpenses.Add(new MonthlyPoint
+            {
+                Month = MonthNames[targetDate.Month - 1],
+                Income = incomeTotal,
+                Expenses = expenseTotal
+            });
+        }
+
+        RecalculateBarRatios();
+        await Task.CompletedTask;
+    }
+
+    private void PopulateRecentTransactions(
+        System.Collections.Generic.List<CoreModels.Expense> monthExpenses,
+        System.Collections.Generic.List<CoreModels.Income> monthIncome)
+    {
+        RecentTransactions.Clear();
+
+        var expenseItems = monthExpenses.Select(e => new TransactionItem
+        {
+            Category = e.Category?.Name ?? "Uncategorized",
+            IconPath = "Assets/Icons/category-default.png", // placeholder — icons TODO
+            Date = e.Date,
+            Amount = -e.Amount // negative: money going out
+        });
+
+        var incomeItems = monthIncome.Select(i => new TransactionItem
+        {
+            Category = i.Source,
+            IconPath = "Assets/Icons/category-income.png", // placeholder
+            Date = i.Date,
+            Amount = i.Amount // positive: money coming in
+        });
+
+        foreach (var t in expenseItems.Concat(incomeItems).OrderByDescending(t => t.Date))
+            RecentTransactions.Add(t);
+    }
+
+    private async Task PopulateBudgetOverviewAsync(System.Collections.Generic.List<CoreModels.Category> allCategories)
+    {
+        BudgetOverview.Clear();
+
+        foreach (var category in allCategories.Where(c => c.MonthlyBudget.HasValue))
+        {
+            var spent = await _budgetService.GetTotalSpentAsync(category.Id, _currentMonth, _currentYear);
+
+            BudgetOverview.Add(new BudgetItem
+            {
+                Category = category.Name,
+                Spent = spent,
+                Limit = category.MonthlyBudget!.Value
+            });
+        }
+    }
+
+    // ----- Month picker handling -----
+
     private void OpenPicker(MonthPickerTarget target)
     {
         _activeTarget = target;
-        // Reset the picker to reflect whichever label is currently active for this target.
         IsMonthPickerOpen = true;
     }
 
-    private void OnMonthChosen(int year, int month)
+    private async void OnMonthChosen(int year, int month)
     {
         var label = $"{MonthNames[month - 1]} {year}";
 
@@ -133,7 +247,14 @@ public class DashboardViewModel : ViewModelBase
             ExpensesPeriodLabel = label.ToLowerInvariant();
 
         IsMonthPickerOpen = false;
+
+        _currentMonth = month;
+        _currentYear = year;
+
+        await LoadDashboardDataAsync();
     }
+
+    // ----- Existing helper calculations (unchanged) -----
 
     private void RecalculateSlicePercents()
     {
