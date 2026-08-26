@@ -47,7 +47,7 @@ public partial class App : Application
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite("Data Source=expensetracker.db"));
+            options.UseSqlite($"Data Source={AppContext.BaseDirectory}expensetracker.db"));
 
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IIncomeRepository, IncomeRepository>();
@@ -56,6 +56,5 @@ public partial class App : Application
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<MainWindowViewModel>();
-        // Add other ViewModels here as they get converted to use DI
     }
 }
