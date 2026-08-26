@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:GCAT.Converters"
+        xmlns:views="using:GCAT.Views"
+        x:Class="GCAT.Views.SplashWindow"
+        x:DataType="views:SplashWindow"
+        Title="G-CAT"
+        Width="676" Height="380"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Background="Black">
+
+  <!-- RootPanel starts fully transparent; code-behind flips Opacity to trigger the
+       fade-in, holds, then flips it back to 0 to fade out before MainWindow opens. -->
+  <Panel x:Name="RootPanel" Opacity="0">
+    <Panel.Transitions>
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.8" Easing="CubicEaseInOut" />
+      </Transitions>
+    </Panel.Transitions>
+
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="18">
+
+      <Border Width="180" Height="180" CornerRadius="42" HorizontalAlignment="Center">
+        <Border.Background>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FF6FB1" Offset="0" />
+            <GradientStop Color="#B01358" Offset="1" />
+          </LinearGradientBrush>
+        </Border.Background>
+        <!-- Drop app-icon.png into Assets/Icons for the cat mascot artwork. -->
+        <Image Source="{Binding IconPath, Converter={x:Static conv:PathToBitmapConverter.Instance}}"
+               Width="120" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+
+      <TextBlock Text="G-CAT" FontSize="34" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" />
+      <TextBlock Text="made with &#10084; by os kneeguards" FontSize="14" Foreground="#FF8FBF"
+                 FontStyle="Italic" HorizontalAlignment="Center" />
+
+    </StackPanel>
+  </Panel>
+</Window>

@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GCAT.ViewModels"
+        xmlns:models="using:GCAT.Models"
+        xmlns:views="using:GCAT.Views"
+        xmlns:conv="using:GCAT.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="GCAT.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="G-CAT"
+        Width="1180" Height="720"
+        MinWidth="960" MinHeight="600"
+        d:DesignWidth="1180" d:DesignHeight="720"
+        Background="{StaticResource BackgroundBrush}">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <Grid ColumnDefinitions="220,*">
+
+    <!-- Sidebar -->
+    <Grid Grid.Column="0" Background="{StaticResource SidebarBrush}" RowDefinitions="Auto,*,Auto">
+
+      <StackPanel Orientation="Horizontal" Margin="24,28,24,16" Spacing="10">
+        <Border Width="38" Height="38" CornerRadius="10">
+          <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+              <GradientStop Color="#FF6FB1" Offset="0" />
+              <GradientStop Color="#B01358" Offset="1" />
+            </LinearGradientBrush>
+          </Border.Background>
+          <Image Source="{Binding AppIconPath, Converter={x:Static conv:PathToBitmapConverter.Instance}}"
+                 Margin="4" />
+        </Border>
+        <TextBlock Text="G-CAT" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+      </StackPanel>
+
+      <ListBox Grid.Row="1"
+               Classes="NavList"
+               ItemsSource="{Binding NavItems}"
+               SelectedItem="{Binding SelectedNavItem}"
+               Margin="12,10">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="models:NavItem">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Image Source="{Binding IconPath, Converter={x:Static conv:PathToBitmapConverter.Instance}}"
+                     Width="26" Height="26" Stretch="Uniform" />
+              <TextBlock Text="{Binding Label}" VerticalAlignment="Center" FontSize="14" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Button Grid.Row="2" Content="+ add transaction" Margin="16,20" Classes="AddTransactionButton" />
+    </Grid>
+
+    <!-- Main content: switches based on which nav item is selected -->
+    <ContentControl Grid.Column="1" Content="{Binding CurrentPage}">
+      <ContentControl.DataTemplates>
+        <DataTemplate DataType="vm:DashboardViewModel">
+          <views:DashboardView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:TransactionsViewModel">
+          <views:TransactionsView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:BudgetViewModel">
+            <views:BudgetView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:SettingsViewModel">
+            <views:SettingsView />
+        </DataTemplate>
+      </ContentControl.DataTemplates>
+    </ContentControl>
+
+  </Grid>
+</Window>

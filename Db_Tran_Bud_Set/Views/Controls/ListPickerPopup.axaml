@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             x:Class="GCAT.Views.Controls.ListPickerPopup"
+             x:CompileBindings="False"
+             Width="330">
+
+  <!-- Reused for both "Filter by type" (image 3) and "Filter by account" (image 4) - same
+       card, just a different Title/Options list supplied by the ListPickerViewModel. -->
+  <Border Background="{StaticResource PopupBackgroundBrush}"
+          CornerRadius="20"
+          Padding="20"
+          BorderBrush="{StaticResource CardBorderBrush}"
+          BorderThickness="1">
+    <StackPanel Spacing="12">
+      <Rectangle Width="40" Height="4" RadiusX="2" RadiusY="2" Fill="#4A3D55" HorizontalAlignment="Center" />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="{Binding Title}" Foreground="White" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="&#10005;" Classes="IconButton" Command="{Binding CloseCommand}" />
+      </Grid>
+
+      <ItemsControl ItemsSource="{Binding Options}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="vm:ListOption">
+            <Button Content="{Binding Label}"
+                    Classes="ListRow"
+                    Classes.SelectedRow="{Binding IsSelected}"
+                    Command="{Binding $parent[ItemsControl].DataContext.SelectCommand}"
+                    CommandParameter="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Border>
+</UserControl>

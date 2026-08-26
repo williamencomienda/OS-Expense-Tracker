@@ -1,0 +1,208 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             xmlns:models="using:GCAT.Models"
+             xmlns:conv="using:GCAT.Converters"
+             xmlns:controls="using:GCAT.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="GCAT.Views.DashboardView"
+             d:DesignWidth="1180" d:DesignHeight="720"
+             x:DataType="vm:DashboardViewModel">
+
+  <Design.DataContext>
+    <vm:DashboardViewModel />
+  </Design.DataContext>
+
+  <Grid>
+
+    <ScrollViewer Padding="32,24">
+      <StackPanel Spacing="16">
+
+        <!-- Header row -->
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="Good day! Your money overview is ready." FontSize="13"
+                       Foreground="{StaticResource TextMutedBrush}" />
+          </StackPanel>
+
+          <Button Grid.Column="1" Classes="Pill" Margin="0,0,10,0" Command="{Binding OpenHeaderMonthPickerCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#128197;" FontSize="13" />
+              <TextBlock Text="{Binding HeaderMonthLabel}" FontSize="13" />
+            </StackPanel>
+          </Button>
+
+          <Button Grid.Column="2" Classes="Pill" Content="meow" />
+        </Grid>
+
+        <!-- Summary cards -->
+        <ItemsControl ItemsSource="{Binding SummaryCards}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="3" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:SummaryCard">
+              <Border Classes="Card" Margin="0,0,16,0">
+                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Title}" FontSize="13"
+                             Foreground="{StaticResource TextMutedBrush}" />
+                  <Border Grid.Row="0" Grid.Column="1" Width="28" Height="28" CornerRadius="14" Background="#2A1A28">
+                    <TextBlock Text="{Binding ChangeArrow}" FontSize="14" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DisplayAmount}"
+                             FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,10,0,6" />
+                  <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DisplayChange}"
+                             FontSize="12" Foreground="{StaticResource TextMutedBrush}" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Middle row: expenses overview + income vs expenses -->
+        <Grid ColumnDefinitions="*,*">
+
+          <Border Grid.Column="0" Classes="Panel" Margin="0,0,16,0" Padding="18">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="expenses overview" Foreground="White" FontSize="15"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="Pill" Command="{Binding OpenExpensesPeriodPickerCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding ExpensesPeriodLabel}" FontSize="12" />
+                    <TextBlock Text="&#9662;" FontSize="10" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+
+              <Grid ColumnDefinitions="Auto,*">
+                <controls:DonutChart Grid.Column="0" Width="108" Height="108"
+                                      ItemsSource="{Binding ExpensesOverview}" Margin="0,0,18,0" />
+
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding ExpensesOverview}" VerticalAlignment="Center">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:ExpenseSlice">
+                      <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4">
+                        <Rectangle Width="10" Height="10" RadiusX="3" RadiusY="3" Fill="{Binding Color}" />
+                        <TextBlock Text="{Binding Category}" Foreground="{StaticResource TextMutedBrush}" FontSize="13" Width="40" />
+                        <TextBlock Text="{Binding DisplayAmount}" Foreground="White" FontSize="13" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Column="1" Classes="Panel" Margin="16,0,0,0" Padding="18">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="income vs expenses" Foreground="White" FontSize="15"
+                           VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="14">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Rectangle Width="10" Height="10" RadiusX="3" RadiusY="3" Fill="{StaticResource IncomeBarBrush}" />
+                    <TextBlock Text="income" FontSize="12" Foreground="{StaticResource TextMutedBrush}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Rectangle Width="10" Height="10" RadiusX="3" RadiusY="3" Fill="{StaticResource ExpensesBarBrush}" />
+                    <TextBlock Text="expenses" FontSize="12" Foreground="{StaticResource TextMutedBrush}" />
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+
+              <ItemsControl ItemsSource="{Binding IncomeVsExpenses}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:MonthlyPoint">
+                    <StackPanel HorizontalAlignment="Center" Spacing="8">
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="100" Spacing="5">
+                        <Rectangle Width="14" VerticalAlignment="Bottom" Fill="{StaticResource IncomeBarBrush}"
+                                   RadiusX="4" RadiusY="4"
+                                   Height="{Binding IncomeRatio, Converter={x:Static conv:RatioToHeightConverter.Instance}, ConverterParameter=100}" />
+                        <Rectangle Width="14" VerticalAlignment="Bottom" Fill="{StaticResource ExpensesBarBrush}"
+                                   RadiusX="4" RadiusY="4"
+                                   Height="{Binding ExpensesRatio, Converter={x:Static conv:RatioToHeightConverter.Instance}, ConverterParameter=100}" />
+                      </StackPanel>
+                      <TextBlock Text="{Binding Month}" FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                 HorizontalAlignment="Center" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- Bottom row: recent transactions + budget overview -->
+        <Grid ColumnDefinitions="*,*">
+
+          <Border Grid.Column="0" Classes="Panel" Margin="0,0,16,0" Padding="18">
+            <StackPanel Spacing="10">
+              <TextBlock Text="recent transactions" Foreground="White" FontSize="15" />
+              <ItemsControl ItemsSource="{Binding RecentTransactions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:TransactionItem">
+                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6">
+                      <Border Grid.Column="0" Width="28" Height="28" CornerRadius="14" Background="#2A1A28" Margin="0,0,10,0">
+                        <Image Source="{Binding IconPath, Converter={x:Static conv:PathToBitmapConverter.Instance}}"
+                               Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Border>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Category}" Foreground="White" FontSize="13" />
+                        <TextBlock Text="{Binding DisplayDate}" Foreground="{StaticResource TextMutedBrush}" FontSize="11" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding DisplayAmount}" VerticalAlignment="Center"
+                                 Classes="AmountText"
+                                 Classes.Expense="{Binding IsExpense}"
+                                 Classes.Income="{Binding IsIncome}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Column="1" Classes="Panel" Margin="16,0,0,0" Padding="18">
+            <StackPanel Spacing="10">
+              <TextBlock Text="budget overview" Foreground="White" FontSize="15" />
+              <ItemsControl ItemsSource="{Binding BudgetOverview}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:BudgetItem">
+                    <StackPanel Margin="0,6" Spacing="6">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="{Binding Category}" Foreground="White" FontSize="13" />
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayLabel}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" />
+                      </Grid>
+                      <ProgressBar Classes="BudgetBar" Minimum="0" Maximum="1" Value="{Binding Progress}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Month picker popup overlay (image 3). Darkens the background and centers the card. -->
+    <Panel IsVisible="{Binding IsMonthPickerOpen}">
+      <Button Classes="OverlayScrim" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              Command="{Binding ClosePickerCommand}" />
+      <controls:MonthPickerPopup HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  MonthPicker="{Binding MonthPicker}"
+                                  CloseCommand="{Binding ClosePickerCommand}" />
+    </Panel>
+
+  </Grid>
+</UserControl>
