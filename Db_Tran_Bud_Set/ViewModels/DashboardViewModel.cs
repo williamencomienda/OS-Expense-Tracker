@@ -99,9 +99,16 @@ public class DashboardViewModel : ViewModelBase
     // Call this right after creating the ViewModel (constructors can't be async)
     public async Task LoadDashboardDataAsync()
     {
+        System.Diagnostics.Debug.WriteLine($"[DEBUG] Working directory: {System.IO.Directory.GetCurrentDirectory()}");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG] Base directory: {AppContext.BaseDirectory}");
+
         var allExpenses = await _expenseRepository.GetAllAsync();
         var allIncome = await _incomeRepository.GetAllAsync();
         var allCategories = await _categoryRepository.GetAllAsync();
+
+        System.Diagnostics.Debug.WriteLine($"[DEBUG] Loaded {allExpenses.Count} expenses, {allIncome.Count} income, {allCategories.Count} categories");
+        foreach (var c in allCategories)
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] Category: {c.Name}, Budget: {c.MonthlyBudget}");
 
         var monthExpenses = allExpenses
             .Where(e => e.Date.Month == _currentMonth && e.Date.Year == _currentYear)
