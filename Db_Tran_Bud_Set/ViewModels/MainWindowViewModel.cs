@@ -46,6 +46,8 @@ public class MainWindowViewModel : ViewModelBase
         Dashboard = dashboardViewModel;
         Transactions = transactionsViewModel;
 
+        Transactions.DataChanged += async () => await Dashboard.LoadDashboardDataAsync();
+
         _currentPage = Dashboard;
         SelectedNavItem = NavItems[0];
     }

@@ -269,6 +269,7 @@ public class TransactionsViewModel : ViewModelBase
         }
 
         await LoadTransactionsAsync();
+        DataChanged?.Invoke();
     }
 
     private async Task<CoreModels.Category> GetOrCreateCategoryAsync(string categoryName)
@@ -293,6 +294,7 @@ public class TransactionsViewModel : ViewModelBase
 
         AllTransactions.Remove(transaction);
         RecomputeFilteredTransactions();
+        DataChanged?.Invoke();
     }
 
     private void WireRowCommands(Transaction transaction)

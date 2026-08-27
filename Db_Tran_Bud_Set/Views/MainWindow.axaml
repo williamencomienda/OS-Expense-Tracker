@@ -54,7 +54,7 @@
         </ListBox.ItemTemplate>
       </ListBox>
 
-      <Button Grid.Row="2" Content="+ add transaction" Margin="16,20" Classes="AddTransactionButton" />
+      <Button Grid.Row="2" Content="OS Knee Guards / Beta 1.0" Margin="10,8" Classes="AddTransactionButton" />
     </Grid>
 
     <!-- Main content: switches based on which nav item is selected -->
