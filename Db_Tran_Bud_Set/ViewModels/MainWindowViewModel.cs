@@ -30,7 +30,7 @@ public class MainWindowViewModel : ViewModelBase
     // they fall back to showing the dashboard for now.
     public DashboardViewModel Dashboard { get; }
     public TransactionsViewModel Transactions { get; }
-    public BudgetViewModel Budget { get; } = new();
+    public BudgetViewModel Budget { get; }
     public SettingsViewModel Settings { get; } = new();
 
     private object _currentPage;
@@ -41,12 +41,14 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     // Dashboard is now injected via DI instead of being created with "new"
-    public MainWindowViewModel(DashboardViewModel dashboardViewModel, TransactionsViewModel transactionsViewModel)
+    public MainWindowViewModel(DashboardViewModel dashboardViewModel, TransactionsViewModel transactionsViewModel, BudgetViewModel budgetViewModel)
     {
         Dashboard = dashboardViewModel;
         Transactions = transactionsViewModel;
+        Budget = budgetViewModel;
 
         Transactions.DataChanged += async () => await Dashboard.LoadDashboardDataAsync();
+        Budget.DataChanged += async () => await Dashboard.LoadDashboardDataAsync();
 
         _currentPage = Dashboard;
         SelectedNavItem = NavItems[0];

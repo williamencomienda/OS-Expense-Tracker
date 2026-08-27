@@ -32,6 +32,7 @@ public partial class SplashWindow : Window
         // Load real data into both pages before showing the window
         await mainWindowViewModel.Dashboard.LoadDashboardDataAsync();
         await mainWindowViewModel.Transactions.LoadTransactionsAsync();
+        await mainWindowViewModel.Budget.LoadBudgetDataAsync();
 
         var main = new MainWindow
         {

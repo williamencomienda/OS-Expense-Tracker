@@ -57,5 +57,6 @@ public partial class App : Application
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<BudgetViewModel>();
     }
 }

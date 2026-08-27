@@ -1,7 +1,11 @@
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using GCAT.Models;
+using CoreModels = ExpenseTracker.Core.Models;
+using ExpenseTracker.Core.Interfaces;
+using System.Collections.Generic;
 
 namespace GCAT.ViewModels;
 
@@ -13,7 +17,12 @@ public class BudgetViewModel : ViewModelBase
         "July", "August", "September", "October", "November", "December"
     };
 
-    // ----- Header -----
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IBudgetService _budgetService;
+
+    private int _currentMonth = 8;
+    private int _currentYear = 2026;
+
     private string _headerMonthLabel = "August 2026";
     public string HeaderMonthLabel
     {
@@ -21,16 +30,10 @@ public class BudgetViewModel : ViewModelBase
         set => SetField(ref _headerMonthLabel, value);
     }
 
-    // ----- Top stat cards -----
-    public ObservableCollection<BudgetSummaryCard> SummaryCards { get; }
+    public ObservableCollection<BudgetSummaryCard> SummaryCards { get; } = new();
+    public ObservableCollection<BudgetCategory> Budgets { get; } = new();
+    public ObservableCollection<BudgetAlert> Alerts { get; } = new();
 
-    // ----- "all budgets" list -----
-    public ObservableCollection<BudgetCategory> Budgets { get; }
-
-    // ----- "alerts" list -----
-    public ObservableCollection<BudgetAlert> Alerts { get; }
-
-    // ----- Popup host - same pattern as TransactionsViewModel -----
     private object? _activePopup;
     public object? ActivePopup
     {
@@ -49,64 +52,139 @@ public class BudgetViewModel : ViewModelBase
     public RelayCommand SetBudgetCommand { get; }
     public RelayCommand ClosePopupCommand { get; }
 
-    // Reuses the exact same month picker control/view model as Dashboard and Transactions.
+    // Fires whenever a budget is changed, so Dashboard/Transactions can react if needed
+    public event Action? DataChanged;
+
     private readonly MonthPickerViewModel _monthPicker;
 
-    public BudgetViewModel()
+    public BudgetViewModel(ICategoryRepository categoryRepository, IBudgetService budgetService)
     {
-        SummaryCards = new ObservableCollection<BudgetSummaryCard>
-        {
-            new() { Title = "total budget", DisplayAmount = "\u20B132,000.00", Subtitle = "across 4 categories" },
-            new() { Title = "total spent", DisplayAmount = "\u20B126,944.00", Subtitle = "84.2% of budget used" },
-            new() { Title = "remaining", DisplayAmount = "\u20B15,056.00", Subtitle = "on track, 9 days left" },
-        };
+        _categoryRepository = categoryRepository;
+        _budgetService = budgetService;
 
-        Budgets = new ObservableCollection<BudgetCategory>
-        {
-            new() { Name = "food", Spent = 7777, Limit = 8000 },
-            new() { Name = "entertainment", Spent = 8367, Limit = 8000 },
-            new() { Name = "transportation", Spent = 5600, Limit = 8000 },
-            new() { Name = "utilities", Spent = 5200, Limit = 8000 },
-        };
-
-        Alerts = new ObservableCollection<BudgetAlert>
-        {
-            new() { Label = "food nearly maxed", BadgeText = "97%", Severity = AlertSeverity.Warning },
-            new() { Label = "entertainment over limit", BadgeText = "+\u20B1367", Severity = AlertSeverity.OverLimit },
-            new() { Label = "transportation sufficient", BadgeText = "healthy", Severity = AlertSeverity.Healthy },
-            new() { Label = "utilities on space", BadgeText = "healthy", Severity = AlertSeverity.Healthy },
-        };
-
-        _monthPicker = new MonthPickerViewModel(2026, 8);
-        _monthPicker.MonthChosen += (year, month) =>
+        _monthPicker = new MonthPickerViewModel(_currentYear, _currentMonth);
+        _monthPicker.MonthChosen += async (year, month) =>
         {
             HeaderMonthLabel = $"{MonthNames[month - 1]} {year}";
             ActivePopup = null;
+            _currentMonth = month;
+            _currentYear = year;
+            await LoadBudgetDataAsync();
         };
 
         OpenHeaderMonthPickerCommand = new RelayCommand(_ => ActivePopup = _monthPicker);
-
-        // TODO: hook up whatever the "meow" button should actually do (profile menu, settings, etc.)
         OpenProfileCommand = new RelayCommand(_ => { });
-
         SetBudgetCommand = new RelayCommand(_ => OpenSetBudget());
-
         ClosePopupCommand = new RelayCommand(_ => ActivePopup = null);
+    }
+
+    // Call this after construction (constructors can't be async)
+    public async Task LoadBudgetDataAsync()
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        var budgetedCategories = categories.Where(c => c.MonthlyBudget.HasValue).ToList();
+
+        Budgets.Clear();
+        Alerts.Clear();
+
+        decimal totalBudget = 0;
+        decimal totalSpent = 0;
+
+        foreach (var category in budgetedCategories)
+        {
+            var spent = await _budgetService.GetTotalSpentAsync(category.Id, _currentMonth, _currentYear);
+            var limit = category.MonthlyBudget!.Value;
+
+            totalBudget += limit;
+            totalSpent += spent;
+
+            Budgets.Add(new BudgetCategory
+            {
+                Name = category.Name,
+                Spent = spent,
+                Limit = limit
+            });
+
+            var ratio = limit == 0 ? 0 : spent / limit;
+            if (ratio > 1m)
+            {
+                Alerts.Add(new BudgetAlert
+                {
+                    Label = $"{category.Name} over limit",
+                    BadgeText = $"+\u20B1{(spent - limit):N0}",
+                    Severity = AlertSeverity.OverLimit
+                });
+            }
+            else if (ratio >= 0.9m)
+            {
+                Alerts.Add(new BudgetAlert
+                {
+                    Label = $"{category.Name} nearly maxed",
+                    BadgeText = $"{ratio:P0}",
+                    Severity = AlertSeverity.Warning
+                });
+            }
+            else
+            {
+                Alerts.Add(new BudgetAlert
+                {
+                    Label = $"{category.Name} sufficient",
+                    BadgeText = "healthy",
+                    Severity = AlertSeverity.Healthy
+                });
+            }
+        }
+
+        var remaining = totalBudget - totalSpent;
+        var percentUsed = totalBudget == 0 ? 0 : totalSpent / totalBudget;
+
+        SummaryCards.Clear();
+        SummaryCards.Add(new BudgetSummaryCard
+        {
+            Title = "total budget",
+            DisplayAmount = $"\u20B1{totalBudget:N2}",
+            Subtitle = $"across {budgetedCategories.Count} categories"
+        });
+        SummaryCards.Add(new BudgetSummaryCard
+        {
+            Title = "total spent",
+            DisplayAmount = $"\u20B1{totalSpent:N2}",
+            Subtitle = $"{percentUsed:P1} of budget used"
+        });
+        SummaryCards.Add(new BudgetSummaryCard
+        {
+            Title = "remaining",
+            DisplayAmount = $"\u20B1{remaining:N2}",
+            Subtitle = remaining >= 0 ? "on track" : "over budget"
+        });
     }
 
     private void OpenSetBudget()
     {
         var form = new SetBudgetViewModel(Budgets);
-        form.Submitted += amounts =>
-        {
-            foreach (var (key, amount) in amounts)
-            {
-                var category = Budgets.FirstOrDefault(b => b.Name == key);
-                if (category != null) category.Limit = amount;
-            }
-            ActivePopup = null;
-        };
+        form.Submitted += async amounts => await OnBudgetsSubmitted(amounts);
         form.CloseRequested += () => ActivePopup = null;
         ActivePopup = form;
+    }
+
+    private async Task OnBudgetsSubmitted(Dictionary<string, decimal> amounts)
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+
+        foreach (var (key, amount) in amounts)
+        {
+            var category = categories.FirstOrDefault(c =>
+                c.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+
+            if (category != null)
+            {
+                category.MonthlyBudget = amount;
+                await _categoryRepository.UpdateAsync(category);
+            }
+        }
+
+        ActivePopup = null;
+        await LoadBudgetDataAsync();
+        DataChanged?.Invoke();
     }
 }
