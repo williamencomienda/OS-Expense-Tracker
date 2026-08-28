@@ -153,7 +153,7 @@ public class DashboardViewModel : ViewModelBase
             {
                 Category = g.Key,
                 Amount = g.Sum(e => e.Amount),
-                Color = new SolidColorBrush(Color.Parse("#CCCCCC")) // placeholder — colors TODO
+                Color = CategoryPalette.BrushFor(g.Key)
             });
 
         foreach (var slice in grouped)

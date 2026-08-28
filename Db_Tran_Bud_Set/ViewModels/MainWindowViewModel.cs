@@ -48,6 +48,7 @@ public class MainWindowViewModel : ViewModelBase
         Budget = budgetViewModel;
 
         Transactions.DataChanged += async () => await Dashboard.LoadDashboardDataAsync();
+        Transactions.DataChanged += async () => await Budget.LoadBudgetDataAsync();
         Budget.DataChanged += async () => await Dashboard.LoadDashboardDataAsync();
 
         _currentPage = Dashboard;
