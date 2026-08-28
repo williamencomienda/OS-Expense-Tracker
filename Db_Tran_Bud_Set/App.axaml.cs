@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -8,6 +9,7 @@ using ExpenseTracker.Data;
 using ExpenseTracker.Data.Repositories;
 using ExpenseTracker.Core.Interfaces;
 using ExpenseTracker.Core.Services;
+using ExpenseTracker.Core.Models;
 using GCAT.ViewModels;
 using GCAT.Views;
 
@@ -33,6 +35,18 @@ public partial class App : Application
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
+
+            if (!db.Categories.Any())
+            {
+                db.Categories.AddRange(
+                    new Category { Name = "Food" },
+                    new Category { Name = "Transport" },
+                    new Category { Name = "Shopping" },
+                    new Category { Name = "Utilities" },
+                    new Category { Name = "Entertainment" }
+                );
+                db.SaveChanges();
+            }
         }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
