@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             xmlns:controls="using:GCAT.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GCAT.Views.SettingsView"
+             d:DesignWidth="1180" d:DesignHeight="720"
+             x:DataType="vm:SettingsViewModel">
+
+  <Design.DataContext>
+    <vm:SettingsViewModel />
+  </Design.DataContext>
+
+  <Grid Background="{StaticResource TransactionsPageBrush}">
+
+    <ScrollViewer Padding="32,24">
+      <StackPanel Spacing="18">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="Settings" FontSize="28" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="Manage your preferences and data." FontSize="13"
+                       Foreground="{StaticResource MutedOnPinkBrush}" />
+          </StackPanel>
+
+          <Button Grid.Column="1" Classes="FilterPill" Command="{Binding OpenProfileCommand}">
+            <TextBlock Text="meow" FontSize="13" />
+          </Button>
+        </Grid>
+
+        <!-- Preferences + Data -->
+        <Grid ColumnDefinitions="*,20,*">
+
+          <!-- Preferences -->
+          <Border Grid.Column="0" Classes="BudgetPanel">
+            <StackPanel>
+              <TextBlock Text="preferences" FontSize="17" FontWeight="Bold" Foreground="White" Margin="0,0,0,16" />
+
+              <!-- Display currency: plain text, not clickable -->
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="display currency" FontSize="15" Foreground="White"
+                           VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding DisplayCurrency}" FontSize="15"
+                           FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+              </Grid>
+              <Border BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1"
+                      Opacity="0.4" Margin="0,14" />
+
+              <!-- Date format: clickable, opens popup -->
+              <Button Classes="SettingsRow" Command="{Binding OpenDateFormatPickerCommand}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="date format" FontSize="15" Foreground="White"
+                             VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding DateFormat}" FontSize="15" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="&#9662;" FontSize="12" Foreground="{StaticResource PinkBorderBrush}" />
+                  </StackPanel>
+                </Grid>
+              </Button>
+            </StackPanel>
+          </Border>
+
+          <!-- Data -->
+          <Border Grid.Column="2" Classes="BudgetPanel">
+            <StackPanel>
+              <TextBlock Text="data" FontSize="17" FontWeight="Bold" Foreground="White" Margin="0,0,0,16" />
+
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="export data" FontSize="15" Foreground="White"
+                           VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="Coming soon" FontSize="14"
+                           Foreground="{StaticResource MutedOnPinkBrush}" VerticalAlignment="Center" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+        </Grid>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Popup overlay -->
+    <Panel IsVisible="{Binding IsPopupOpen}">
+      <Button Classes="OverlayScrim" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              Command="{Binding ClosePopupCommand}" />
+
+      <ContentControl x:CompileBindings="False" Content="{Binding ActivePopup}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="vm:DateFormatPickerViewModel">
+            <controls:DateFormatPickerPopup />
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+    </Panel>
+
+  </Grid>
+</UserControl>

@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             x:Class="GCAT.Views.Controls.ImportTransactionPopup"
+             x:CompileBindings="False"
+             Width="360">
+
+  <!-- Image 2. Reused for both "Add" (header import button) and "Edit" (row action menu) -
+       ImportTransactionViewModel decides which mode it's in and pre-fills fields accordingly. -->
+  <Border Background="{StaticResource PopupBackgroundBrush}"
+          CornerRadius="20"
+          Padding="20"
+          BorderBrush="{StaticResource CardBorderBrush}"
+          BorderThickness="1">
+    <StackPanel Spacing="12">
+      <Rectangle Width="40" Height="4" RadiusX="2" RadiusY="2" Fill="#4A3D55" HorizontalAlignment="Center" />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="Import transaction" Foreground="White" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="&#10005;" Classes="IconButton" Command="{Binding CancelCommand}" />
+      </Grid>
+
+      <StackPanel Spacing="6">
+        <TextBlock Text="DATE" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <Grid ColumnDefinitions="1.5*,*,1.3*">
+          <ComboBox Grid.Column="0" ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding SelectedMonth}"
+                     Margin="0,0,6,0" HorizontalAlignment="Stretch" PlaceholderText="Month" />
+          <ComboBox Grid.Column="1" ItemsSource="{Binding DayOptions}" SelectedItem="{Binding SelectedDay}"
+                     Margin="6,0,6,0" HorizontalAlignment="Stretch" PlaceholderText="Day" />
+          <ComboBox Grid.Column="2" ItemsSource="{Binding YearOptions}" SelectedItem="{Binding SelectedYear}"
+                     Margin="6,0,0,0" Padding="8,6" HorizontalAlignment="Stretch" PlaceholderText="Year" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="6">
+        <TextBlock Text="DESCRIPTION" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <TextBox Watermark="Type here" Text="{Binding Description}" />
+      </StackPanel>
+
+      <StackPanel Spacing="6" IsVisible="{Binding IsExpense}">
+        <TextBlock Text="CATEGORY" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <ComboBox ItemsSource="{Binding CategoryOptions}" SelectedItem="{Binding SelectedCategory}"
+                   HorizontalAlignment="Stretch" PlaceholderText="Select" />
+      </StackPanel>
+
+      <StackPanel Spacing="6">
+        <TextBlock Text="TYPE" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <Grid ColumnDefinitions="*,*">
+          <Button Grid.Column="0" Content="Income" Classes="TypeToggle" Classes.Active="{Binding IsIncome}"
+                  Margin="0,0,6,0" Command="{Binding SelectIncomeCommand}" />
+          <Button Grid.Column="1" Content="Expense" Classes="TypeToggle" Classes.Active="{Binding IsExpense}"
+                  Margin="6,0,0,0" Command="{Binding SelectExpenseCommand}" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="6">
+        <TextBlock Text="AMOUNT" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <TextBox Watermark="Enter amount" Text="{Binding AmountText}" />
+      </StackPanel>
+
+      <Grid ColumnDefinitions="*,*" Margin="0,6,0,0">
+        <Button Grid.Column="0" Content="Cancel" Classes="SecondaryAction" Margin="0,0,6,0" Command="{Binding CancelCommand}" />
+        <Button Grid.Column="1" Content="{Binding SubmitLabel}" Classes="PrimaryAction" Margin="6,0,0,0" Command="{Binding SubmitCommand}" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

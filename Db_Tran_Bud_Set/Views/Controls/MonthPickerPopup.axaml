@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             x:Class="GCAT.Views.Controls.MonthPickerPopup"
+             x:CompileBindings="False"
+             x:Name="Root"
+             Width="330">
+
+  <!-- Card matches image 3: drag handle, "Select month" header with close (X),
+       year navigation row, and a 3-column grid of month buttons. -->
+  <Border Background="{StaticResource PopupBackgroundBrush}"
+          CornerRadius="20"
+          Padding="20"
+          BorderBrush="{StaticResource CardBorderBrush}"
+          BorderThickness="1">
+    <StackPanel Spacing="16">
+
+      <Rectangle Width="40" Height="4" RadiusX="2" RadiusY="2" Fill="#4A3D55" HorizontalAlignment="Center" />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="Select month" Foreground="White" FontSize="16" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="&#10005;" Classes="IconButton" Command="{Binding #Root.CloseCommand}" />
+      </Grid>
+
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Button Grid.Column="0" Content="&lt;" Classes="YearNavButton" Command="{Binding #Root.MonthPicker.PrevYearCommand}" />
+        <TextBlock Grid.Column="1" Text="{Binding #Root.MonthPicker.Year}" Foreground="White" FontSize="16"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Button Grid.Column="2" Content="&gt;" Classes="YearNavButton" Command="{Binding #Root.MonthPicker.NextYearCommand}" />
+      </Grid>
+
+      <ItemsControl ItemsSource="{Binding #Root.MonthPicker.Months}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="3" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:MonthOption">
+            <Button Content="{Binding Label}"
+                    Margin="4"
+                    Classes="MonthButton"
+                    Classes.SelectedMonth="{Binding IsSelected}"
+                    Command="{Binding #Root.MonthPicker.ChooseMonthCommand}"
+                    CommandParameter="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+    </StackPanel>
+  </Border>
+</UserControl>

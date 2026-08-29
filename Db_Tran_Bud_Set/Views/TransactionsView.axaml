@@ -1,0 +1,193 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             xmlns:models="using:GCAT.Models"
+             xmlns:conv="using:GCAT.Converters"
+             xmlns:controls="using:GCAT.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="GCAT.Views.TransactionsView"
+             d:DesignWidth="1180" d:DesignHeight="720"
+             x:DataType="vm:TransactionsViewModel">
+
+  <Design.DataContext>
+    <vm:TransactionsViewModel />
+  </Design.DataContext>
+
+  <Grid Background="{StaticResource TransactionsPageBrush}">
+
+    <ScrollViewer Padding="32,24">
+      <StackPanel Spacing="18">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="Transaction" FontSize="28" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="The history of your wallet's little adventures." FontSize="13"
+                       Foreground="{StaticResource MutedOnPinkBrush}" />
+          </StackPanel>
+
+          <Button Grid.Column="1" Classes="FilterPill" Margin="0,0,10,0" Command="{Binding OpenHeaderMonthPickerCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#128197;" FontSize="13" />
+              <TextBlock Text="{Binding HeaderMonthLabel}" FontSize="13" />
+              <TextBlock Text="&#9662;" FontSize="10" />
+            </StackPanel>
+          </Button>
+
+          <Button Grid.Column="2" Classes="FilterPill" Command="{Binding OpenImportCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#8595;" FontSize="13" />
+              <TextBlock Text="import" FontSize="13" />
+            </StackPanel>
+          </Button>
+        </Grid>
+
+        <!-- Summary cards -->
+        <ItemsControl ItemsSource="{Binding SummaryCards}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="3" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:SummaryCard">
+              <Border Classes="Card" Margin="0,0,16,0">
+                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Title}" FontSize="13"
+                             Foreground="{StaticResource MutedOnPinkBrush}" />
+                  <Border Grid.Row="0" Grid.Column="1" Width="28" Height="28" CornerRadius="14" Background="#3A1530">
+                    <TextBlock Text="{Binding ChangeArrow}" FontSize="14" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DisplayAmount}"
+                             FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,10,0,6" />
+                  <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DisplayChange}"
+                             FontSize="12" Foreground="{StaticResource MutedOnPinkBrush}" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Search / filter row -->
+        <Grid ColumnDefinitions="2*,*,Auto">
+          <Border Grid.Column="0" Classes="SearchPill" Margin="0,0,10,0">
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Grid.Column="0" Text="&#128269;" FontSize="13" Foreground="{StaticResource TextMutedBrush}"
+                         Margin="0,0,8,0" VerticalAlignment="Center" />
+              <TextBox Grid.Column="1" Background="Transparent" BorderThickness="0" Padding="0"
+                       Watermark="search transactions..." Text="{Binding SearchText}"
+                       VerticalAlignment="Center" VerticalContentAlignment="Center" />
+            </Grid>
+          </Border>
+
+          <Button Grid.Column="1" Classes="FilterPill" Margin="0,0,10,0" Command="{Binding OpenTypeFilterCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="{Binding TypeFilterLabel}" />
+              <TextBlock Text="&#9662;" FontSize="10" />
+            </StackPanel>
+          </Button>
+
+          <Button Grid.Column="2" Classes="FilterPill" Command="{Binding OpenFiltersCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="&#127898;" FontSize="13" />
+              <TextBlock Text="filters" />
+            </StackPanel>
+          </Button>
+        </Grid>
+
+        <!-- Table -->
+        <Border Classes="TableCard">
+          <Grid RowDefinitions="Auto,*">
+
+            <Grid Grid.Row="0" Classes="TableHeaderRow" ColumnDefinitions="120,1.6*,110,100,110,60">
+              <TextBlock Grid.Column="0" Text="date" Classes="TableHeaderText" Margin="16,10" />
+              <TextBlock Grid.Column="1" Text="description" Classes="TableHeaderText" Margin="0,10" />
+              <TextBlock Grid.Column="2" Text="category" Classes="TableHeaderText" Margin="0,10" />
+              <TextBlock Grid.Column="3" Text="type" Classes="TableHeaderText" Margin="0,10" />
+              <TextBlock Grid.Column="4" Text="amount" Classes="TableHeaderText" Margin="0,10" HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="5" Text="action" Classes="TableHeaderText" Margin="0,10,16,10" HorizontalAlignment="Center" />
+            </Grid>
+
+            <!-- Scrollable once there are more than ~5 rows (placeholder data only has a few). -->
+            <ScrollViewer Grid.Row="1" MaxHeight="360">
+              <ItemsControl ItemsSource="{Binding FilteredTransactions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:Transaction">
+                    <Grid ColumnDefinitions="120,1.6*,110,100,110,60">
+                      <Border Grid.ColumnSpan="6" BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1" />
+
+                      <TextBlock Grid.Column="0" Text="{Binding DisplayDate}" Foreground="White" FontSize="13"
+                                 Margin="16,14" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding Description}" Foreground="White" FontSize="13"
+                                 Margin="0,14" VerticalAlignment="Center" />
+
+                      <Border Grid.Column="2" Classes="CategoryPill" BorderBrush="{Binding CategoryBrush}"
+                              HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Category}" FontSize="12" Foreground="{Binding CategoryBrush}" />
+                      </Border>
+
+                      <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding TypeGlyph}" FontSize="12" Classes="AmountText"
+                                   Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
+                        <TextBlock Text="{Binding TypeLabel}" FontSize="13" Classes="AmountText"
+                                   Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
+                      </StackPanel>
+
+                      <TextBlock Grid.Column="4" Text="{Binding DisplayAmount}" FontSize="13"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center"
+                                 Classes="AmountText" Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
+
+                      <Button Grid.Column="5" Classes="DotsButton" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <StackPanel Spacing="3" HorizontalAlignment="Center">
+                          <Ellipse Width="4" Height="4" Fill="{StaticResource TextMutedBrush}" />
+                          <Ellipse Width="4" Height="4" Fill="{StaticResource TextMutedBrush}" />
+                        </StackPanel>
+                        <Button.Flyout>
+                          <MenuFlyout Placement="BottomEdgeAlignedRight">
+                            <MenuItem Header="Edit" Command="{Binding EditCommand}" />
+                            <MenuItem Header="Remove" Command="{Binding RemoveCommand}" />
+                          </MenuFlyout>
+                        </Button.Flyout>
+                      </Button>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Popup overlay: one host for all four popups. Reflection bindings inside this
+         subtree (x:CompileBindings=False) since it hosts several different view model
+         types via implicit DataTemplates. -->
+    <Panel IsVisible="{Binding IsPopupOpen}">
+      <Button Classes="OverlayScrim" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              Command="{Binding ClosePopupCommand}" />
+
+      <ContentControl x:CompileBindings="False" Content="{Binding ActivePopup}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="vm:MonthPickerViewModel">
+            <controls:MonthPickerPopup MonthPicker="{Binding}"
+                                        CloseCommand="{Binding $parent[ContentControl].DataContext.ClosePopupCommand}" />
+          </DataTemplate>
+          <DataTemplate DataType="vm:ListPickerViewModel">
+            <controls:ListPickerPopup />
+          </DataTemplate>
+          <DataTemplate DataType="vm:FiltersViewModel">
+            <controls:FiltersPopup />
+          </DataTemplate>
+          <DataTemplate DataType="vm:ImportTransactionViewModel">
+            <controls:ImportTransactionPopup />
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+    </Panel>
+
+  </Grid>
+</UserControl>

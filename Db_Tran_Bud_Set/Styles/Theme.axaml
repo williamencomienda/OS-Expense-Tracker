@@ -1,0 +1,482 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+
+      <!-- Palette -->
+      <SolidColorBrush x:Key="BackgroundBrush" Color="#0B0710" />
+      <SolidColorBrush x:Key="SidebarBrush" Color="#0B0710" />
+      <SolidColorBrush x:Key="TextMutedBrush" Color="#B98CA0" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="PositiveBrush" Color="#3DDC84" />
+      <SolidColorBrush x:Key="NegativeBrush" Color="#FF5C7A" />
+      <SolidColorBrush x:Key="IncomeBarBrush" Color="#FF6FB1" />
+      <SolidColorBrush x:Key="ExpensesBarBrush" Color="#4A1030" />
+      <SolidColorBrush x:Key="PopupBackgroundBrush" Color="#1A1420" />
+      <SolidColorBrush x:Key="CardBorderBrush" Color="#2B1E2C" />
+
+      <LinearGradientBrush x:Key="CardGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#4A1030" Offset="0" />
+        <GradientStop Color="#170810" Offset="1" />
+      </LinearGradientBrush>
+
+      <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+        <GradientStop Color="#FF6FB1" Offset="0" />
+        <GradientStop Color="#C2185B" Offset="1" />
+      </LinearGradientBrush>
+
+      <LinearGradientBrush x:Key="MonthSelectedGradientBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+        <GradientStop Color="#FFD76F" Offset="0" />
+        <GradientStop Color="#FF8FC9" Offset="1" />
+      </LinearGradientBrush>
+
+      <!-- Transactions page palette -->
+      <LinearGradientBrush x:Key="TransactionsPageBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#D6598F" Offset="0" />
+        <GradientStop Color="#B23566" Offset="1" />
+      </LinearGradientBrush>
+      <SolidColorBrush x:Key="TableHeaderBrush" Color="#F0AFCB" />
+      <SolidColorBrush x:Key="TableRowBrush" Color="#150A14" />
+      <SolidColorBrush x:Key="TableBorderBrush" Color="#5C2748" />
+      <SolidColorBrush x:Key="MutedOnPinkBrush" Color="#FBD9E7" />
+
+      <!-- Budget page palette -->
+      <LinearGradientBrush x:Key="BudgetPageBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#DE7A9E" Offset="0.0" />
+        <GradientStop Color="#7A2E4C" Offset="0.45" />
+        <GradientStop Color="#2A1018" Offset="0.75" />
+        <GradientStop Color="#0B0710" Offset="1.0" />
+      </LinearGradientBrush>
+      <SolidColorBrush x:Key="BudgetStatCardBrush" Color="#9C3F63" />
+      <SolidColorBrush x:Key="PinkBorderBrush" Color="#F0A0C0" />
+      <SolidColorBrush x:Key="WarningBadgeBrush" Color="#C9A227" />
+
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Base -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+    <Setter Property="FontFamily" Value="Segoe UI, Inter, sans-serif" />
+  </Style>
+  <Style Selector="UserControl">
+    <Setter Property="FontFamily" Value="Segoe UI, Inter, sans-serif" />
+  </Style>
+
+  <!-- Sidebar nav list -->
+  <Style Selector="ListBox.NavList">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBox.NavList ListBoxItem">
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="Margin" Value="0,3" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+  </Style>
+  <Style Selector="ListBox.NavList ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentGradientBrush}" />
+    <Setter Property="CornerRadius" Value="12" />
+  </Style>
+  <Style Selector="ListBox.NavList ListBoxItem:selected">
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="ListBox.NavList ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1E1522" />
+  </Style>
+
+  <!-- Cards / panels -->
+  <Style Selector="Border.Card">
+    <Setter Property="Background" Value="{StaticResource CardGradientBrush}" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="20" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Border.Panel">
+    <Setter Property="Background" Value="#140C18" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="20" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- Pill buttons: month dropdown, "meow", "this month" -->
+  <Style Selector="Button.Pill">
+    <Setter Property="Background" Value="#140C18" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="16,10" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Button.Pill:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#20141F" />
+  </Style>
+
+  <!-- "add transaction" FAB -->
+  <Style Selector="Button.AddTransactionButton">
+    <Setter Property="Background" Value="{StaticResource AccentGradientBrush}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="0,14" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Popup card shell (Set budget, and reusable for future form popups) -->
+  <Style Selector="Border.PopupCard">
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#231328" Offset="0" />
+        <GradientStop Color="#150A18" Offset="1" />
+      </LinearGradientBrush>
+    </Setter>
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="28" />
+  </Style>
+ 
+  <!-- Pink caps section label: DATE, FOOD, ENTERTAINMENT, etc. -->
+  <Style Selector="TextBlock.PopupSectionLabel">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{StaticResource PinkBorderBrush}" />
+  </Style>
+ 
+  <!-- Dark pink-bordered input fields (TextBox and ComboBox both use this) -->
+  <Style Selector="TextBox.PopupField, ComboBox.PopupField">
+    <Setter Property="Background" Value="#1A0E20" />
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+ 
+  <!-- Small transparent icon button, used for the "X" close button -->
+  <Style Selector="Button.IconButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+ 
+  <!-- Cancel button: outlined, transparent -->
+  <Style Selector="Button.PopupCancel">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="Padding" Value="0,14" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+ 
+  <!-- Set button: gold-to-pink gradient pill -->
+  <Style Selector="Button.PopupSubmit">
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+        <GradientStop Color="#F6C15C" Offset="0" />
+        <GradientStop Color="#F472C0" Offset="1" />
+      </LinearGradientBrush>
+    </Setter>
+    <Setter Property="Foreground" Value="Black" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="0,14" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- The "DATE" select button in the Set budget popup -->
+  <Style Selector="Button.PopupField">
+    <Setter Property="Background" Value="#1A0E20" />
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <!-- Small icon-only button (the "X" close on the month picker) -->
+  <Style Selector="Button.IconButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="Button.IconButton:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#241A26" />
+  </Style>
+
+  <!-- Year nav arrows in the month picker -->
+  <Style Selector="Button.YearNavButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Width" Value="34" />
+    <Setter Property="Height" Value="34" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Month grid buttons -->
+  <Style Selector="Button.MonthButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="0,10" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.MonthButton.SelectedMonth">
+    <Setter Property="Background" Value="{StaticResource MonthSelectedGradientBrush}" />
+    <Setter Property="Foreground" Value="#2B1200" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <!-- Darkened backdrop behind the month picker popup -->
+  <Style Selector="Button.OverlayScrim">
+    <Setter Property="Background" Value="#B3000000" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+  </Style>
+
+  <!-- Budget progress bars -->
+  <Style Selector="ProgressBar.BudgetBar">
+    <Setter Property="Height" Value="8" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Background" Value="#241A26" />
+    <Setter Property="Foreground" Value="{StaticResource AccentGradientBrush}" />
+  </Style>
+
+  <!-- Budget page: stat cards (pink-bordered, on the pink page background) -->
+  <Style Selector="Border.BudgetStatCard">
+    <Setter Property="Background" Value="{StaticResource BudgetStatCardBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="22,18" />
+  </Style>
+ 
+  <!-- Budget page: dark panels ("all budgets", "alerts") -->
+  <Style Selector="Border.BudgetPanel">
+    <Setter Property="Background" Value="{StaticResource TableRowBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource PinkBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="24,20" />
+  </Style>
+ 
+  <!-- Progress bar goes red when a category is over budget -->
+  <Style Selector="ProgressBar.BudgetBar.Over">
+    <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
+  </Style>
+ 
+  <!-- Percent label under each budget bar -->
+  <Style Selector="TextBlock.BudgetPercentText">
+    <Setter Property="Foreground" Value="{StaticResource MutedOnPinkBrush}" />
+  </Style>
+  <Style Selector="TextBlock.BudgetPercentText.Over">
+    <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
+  </Style>
+ 
+  <!-- Status badges in the "alerts" panel -->
+  <Style Selector="Border.Badge">
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="16,6" />
+  </Style>
+  <Style Selector="Border.Badge.Warning">
+    <Setter Property="Background" Value="{StaticResource WarningBadgeBrush}" />
+  </Style>
+  <Style Selector="Border.Badge.OverLimit">
+    <Setter Property="Background" Value="{StaticResource NegativeBrush}" />
+  </Style>
+  <Style Selector="Border.Badge.Healthy">
+    <Setter Property="Background" Value="{StaticResource PositiveBrush}" />
+  </Style>
+  <Style Selector="TextBlock.BadgeText">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <!-- Transaction amount coloring -->
+  <Style Selector="TextBlock.AmountText">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.AmountText.Expense">
+    <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
+  </Style>
+  <Style Selector="TextBlock.AmountText.Income">
+    <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
+  </Style>
+
+  <!-- Transactions page: search / dropdown pill row -->
+  <Style Selector="Border.SearchPill">
+    <Setter Property="Background" Value="#170A16" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="BorderBrush" Value="{StaticResource TableBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="14,10" />
+  </Style>
+  <Style Selector="Button.FilterPill">
+    <Setter Property="Background" Value="#170A16" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="BorderBrush" Value="{StaticResource TableBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+  </Style>
+  <Style Selector="Button.FilterPill:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#22101F" />
+  </Style>
+
+  <!-- Transactions table -->
+  <Style Selector="Border.TableCard">
+    <Setter Property="Background" Value="{StaticResource TableRowBrush}" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="BorderBrush" Value="{StaticResource TableBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </Style>
+  <Style Selector="Grid.TableHeaderRow">
+    <Setter Property="Background" Value="{StaticResource TableHeaderBrush}" />
+  </Style>
+  <Style Selector="TextBlock.TableHeaderText">
+    <Setter Property="Foreground" Value="#3B0F26" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Category pill in the table (border color set per-row via Transaction.CategoryBrush) -->
+  <Style Selector="Border.CategoryPill">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="Padding" Value="10,4" />
+  </Style>
+
+  <!-- Row action "..." (two dots) button -->
+  <Style Selector="Button.DotsButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.DotsButton:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#241A26" />
+  </Style>
+
+  <!-- Simple list-row picker (Filter by type / Filter by account) -->
+  <Style Selector="Button.ListRow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Padding" Value="0,12" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="BorderBrush" Value="#2B1E2C" />
+  </Style>
+  <Style Selector="Button.ListRow:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#20141F" />
+  </Style>
+  <Style Selector="Button.ListRow.SelectedRow">
+    <Setter Property="Foreground" Value="{StaticResource IncomeBarBrush}" />
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <!-- Form controls (Import transaction / Filters popups) -->
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="#140C18" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="CaretBrush" Value="White" />
+  </Style>
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="#140C18" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+  </Style>
+  <Style Selector="ComboBoxItem">
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <!-- Income / Expense toggle in the Import transaction form -->
+  <Style Selector="Button.TypeToggle">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="18,10" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.TypeToggle.Active">
+    <Setter Property="Background" Value="{StaticResource AccentGradientBrush}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <!-- Primary / secondary form action buttons -->
+  <Style Selector="Button.PrimaryAction">
+    <Setter Property="Background" Value="{StaticResource MonthSelectedGradientBrush}" />
+    <Setter Property="Foreground" Value="#2B1200" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="0,12" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.SecondaryAction">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="0,12" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Context menu (row "..." Edit/Remove) -->
+  <Style Selector="MenuFlyoutPresenter">
+    <Setter Property="Background" Value="#1A1420" />
+    <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="4" />
+  </Style>
+  <Style Selector="MenuItem">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+
+  <!-- Full-width transparent clickable row (Settings page preference rows) -->
+  <Style Selector="Button.SettingsRow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+  </Style>
+
+</Styles>

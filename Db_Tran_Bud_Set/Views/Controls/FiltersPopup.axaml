@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             x:Class="GCAT.Views.Controls.FiltersPopup"
+             x:CompileBindings="False"
+             Width="360">
+
+  <Border Background="{StaticResource PopupBackgroundBrush}"
+          CornerRadius="20"
+          Padding="20"
+          BorderBrush="{StaticResource CardBorderBrush}"
+          BorderThickness="1">
+    <StackPanel Spacing="14">
+      <Rectangle Width="40" Height="4" RadiusX="2" RadiusY="2" Fill="#4A3D55" HorizontalAlignment="Center" />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="Filters" Foreground="White" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="&#10005;" Classes="IconButton" Command="{Binding CloseCommand}" />
+      </Grid>
+
+      <StackPanel Spacing="8">
+        <TextBlock Text="CATEGORY" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <ItemsControl ItemsSource="{Binding Categories}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:ListOption">
+              <Button Content="{Binding Label}" Margin="0,0,8,8" Padding="14,8"
+                      Classes="MonthButton" Classes.SelectedMonth="{Binding IsSelected}"
+                      Command="{Binding $parent[ItemsControl].DataContext.SelectCategoryCommand}"
+                      CommandParameter="{Binding}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Spacing="8">
+        <TextBlock Text="DATE RANGE" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <Grid ColumnDefinitions="*,*">
+          <TextBox Grid.Column="0" Watermark="From" Text="{Binding DateFrom}" Margin="0,0,6,0" />
+          <TextBox Grid.Column="1" Watermark="To" Text="{Binding DateTo}" Margin="6,0,0,0" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="8">
+        <TextBlock Text="AMOUNT RANGE" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <Grid ColumnDefinitions="*,*">
+          <TextBox Grid.Column="0" Watermark="Min &#8369;" Text="{Binding AmountMin}" Margin="0,0,6,0" />
+          <TextBox Grid.Column="1" Watermark="Max &#8369;" Text="{Binding AmountMax}" Margin="6,0,0,0" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="8">
+        <TextBlock Text="SORT BY" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
+        <ItemsControl ItemsSource="{Binding SortOptions}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:ListOption">
+              <Button Content="{Binding Label}" Margin="0,0,8,8" Padding="14,8"
+                      Classes="MonthButton" Classes.SelectedMonth="{Binding IsSelected}"
+                      Command="{Binding $parent[ItemsControl].DataContext.SelectSortCommand}"
+                      CommandParameter="{Binding}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+        <Button Grid.Column="0" Content="Reset" Classes="SecondaryAction" Margin="0,0,6,0" Command="{Binding ResetCommand}" />
+        <Button Grid.Column="1" Content="Apply filters" Classes="PrimaryAction" Margin="6,0,0,0" Command="{Binding ApplyCommand}" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

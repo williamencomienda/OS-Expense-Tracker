@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             xmlns:models="using:GCAT.Models"
+             xmlns:controls="using:GCAT.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GCAT.Views.BudgetView"
+             d:DesignWidth="1180" d:DesignHeight="720"
+             x:DataType="vm:BudgetViewModel">
+
+  <Design.DataContext>
+    <vm:BudgetViewModel />
+  </Design.DataContext>
+
+  <Grid Background="{StaticResource TransactionsPageBrush}">
+
+    <ScrollViewer Padding="32,24">
+      <StackPanel Spacing="18">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="Budget" FontSize="28" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="Here's how your spending stacks up this month." FontSize="13"
+                       Foreground="{StaticResource MutedOnPinkBrush}" />
+          </StackPanel>
+
+          <Button Grid.Column="1" Classes="FilterPill" Margin="0,0,10,0"
+                  Command="{Binding OpenHeaderMonthPickerCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#128197;" FontSize="13" />
+              <TextBlock Text="{Binding HeaderMonthLabel}" FontSize="13" />
+              <TextBlock Text="&#9662;" FontSize="10" />
+            </StackPanel>
+          </Button>
+
+          <Button Grid.Column="2" Classes="FilterPill" Command="{Binding OpenProfileCommand}">
+            <TextBlock Text="meow" FontSize="13" />
+          </Button>
+        </Grid>
+
+        <!-- Summary cards: total budget / total spent / remaining -->
+        <ItemsControl ItemsSource="{Binding SummaryCards}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="3" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:BudgetSummaryCard">
+              <Border Classes="Card" Margin="0,0,16,0">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="{Binding Title}" FontSize="13" Foreground="{StaticResource MutedOnPinkBrush}" />
+                  <TextBlock Text="{Binding DisplayAmount}" FontSize="24" FontWeight="Bold"
+                             Foreground="White" Margin="0,4,0,0" />
+                  <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource MutedOnPinkBrush}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- All budgets + Alerts -->
+        <Grid ColumnDefinitions="1.4*,16,*">
+
+          <!-- All budgets -->
+          <Border Grid.Column="0" Classes="BudgetPanel">
+            <StackPanel>
+              <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+                <TextBlock Grid.Column="0" Text="all budgets" FontSize="17" FontWeight="Bold" Foreground="White" />
+                <Button Grid.Column="1" Classes="FilterPill" Padding="14,8"
+                        Command="{Binding OpenHeaderMonthPickerCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="select month" FontSize="13" />
+                    <TextBlock Text="&#9662;" FontSize="10" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+
+              <ItemsControl ItemsSource="{Binding Budgets}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:BudgetCategory">
+                    <StackPanel Margin="0,0,0,18">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="15"
+                                   FontWeight="SemiBold" Foreground="White" />
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayAmount}" FontSize="14"
+                                   FontWeight="Bold" Foreground="White" />
+                      </Grid>
+
+                      <ProgressBar Classes="BudgetBar" Classes.Over="{Binding IsOverBudget}"
+                                   Value="{Binding ProgressValue}" Maximum="100" Margin="0,10,0,4" />
+
+                      <TextBlock Text="{Binding DisplayPercent}" FontSize="13" FontWeight="SemiBold"
+                                 HorizontalAlignment="Right" Classes="BudgetPercentText"
+                                 Classes.Over="{Binding IsOverBudget}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Alerts -->
+          <Border Grid.Column="2" Classes="BudgetPanel">
+            <StackPanel>
+              <TextBlock Text="alerts" FontSize="17" FontWeight="Bold" Foreground="White" Margin="0,0,0,16" />
+
+              <ItemsControl ItemsSource="{Binding Alerts}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:BudgetAlert">
+                    <StackPanel Margin="0,0,0,16">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="14" Foreground="White"
+                                   VerticalAlignment="Center" />
+                        <Border Grid.Column="1" Classes="Badge"
+                                Classes.Warning="{Binding IsWarning}"
+                                Classes.OverLimit="{Binding IsOverLimit}"
+                                Classes.Healthy="{Binding IsHealthy}">
+                          <TextBlock Text="{Binding BadgeText}" Classes="BadgeText" />
+                        </Border>
+                      </Grid>
+                      <Border BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1"
+                              Opacity="0.4" Margin="0,14,0,0" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+        </Grid>
+
+        <!-- Set budget button -->
+        <Button Classes="AddTransactionButton" HorizontalAlignment="Left" Padding="28,14"
+                Content="+ set budget" Command="{Binding SetBudgetCommand}" />
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Popup overlay: only the shared month picker is used on this page. -->
+    <Panel IsVisible="{Binding IsPopupOpen}">
+      <Button Classes="OverlayScrim" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              Command="{Binding ClosePopupCommand}" />
+
+      <ContentControl x:CompileBindings="False" Content="{Binding ActivePopup}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="vm:MonthPickerViewModel">
+            <controls:MonthPickerPopup MonthPicker="{Binding}"
+                                        CloseCommand="{Binding $parent[ContentControl].DataContext.ClosePopupCommand}" />
+          </DataTemplate>
+          <DataTemplate DataType="vm:SetBudgetViewModel">
+            <controls:SetBudgetPopup />
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+    </Panel>
+
+  </Grid>
+</UserControl>
