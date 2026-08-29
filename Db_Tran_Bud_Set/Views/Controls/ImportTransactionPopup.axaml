@@ -44,12 +44,6 @@
       </StackPanel>
 
       <StackPanel Spacing="6">
-        <TextBlock Text="ACCOUNT" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
-        <ComboBox ItemsSource="{Binding AccountOptions}" SelectedItem="{Binding SelectedAccount}"
-                   HorizontalAlignment="Stretch" PlaceholderText="Select" />
-      </StackPanel>
-
-      <StackPanel Spacing="6">
         <TextBlock Text="TYPE" FontSize="11" Foreground="{StaticResource TextMutedBrush}" FontWeight="Bold" />
         <Grid ColumnDefinitions="*,*">
           <Button Grid.Column="0" Content="Income" Classes="TypeToggle" Classes.Active="{Binding IsIncome}"

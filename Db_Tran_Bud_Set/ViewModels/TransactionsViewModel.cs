@@ -54,13 +54,6 @@ public class TransactionsViewModel : ViewModelBase
         set => SetField(ref _typeFilterLabel, value);
     }
 
-    private string _accountFilterLabel = "all accounts";
-    public string AccountFilterLabel
-    {
-        get => _accountFilterLabel;
-        set => SetField(ref _accountFilterLabel, value);
-    }
-
     private object? _activePopup;
     public object? ActivePopup
     {
@@ -77,7 +70,6 @@ public class TransactionsViewModel : ViewModelBase
     public RelayCommand OpenHeaderMonthPickerCommand { get; }
     public RelayCommand OpenImportCommand { get; }
     public RelayCommand OpenTypeFilterCommand { get; }
-    public RelayCommand OpenAccountFilterCommand { get; }
     public RelayCommand OpenFiltersCommand { get; }
     public RelayCommand ClosePopupCommand { get; }
 
@@ -111,7 +103,6 @@ public class TransactionsViewModel : ViewModelBase
         OpenHeaderMonthPickerCommand = new RelayCommand(_ => ActivePopup = _monthPicker);
         OpenImportCommand = new RelayCommand(_ => OpenImport(null));
         OpenTypeFilterCommand = new RelayCommand(_ => OpenTypeFilter());
-        OpenAccountFilterCommand = new RelayCommand(_ => OpenAccountFilter());
         OpenFiltersCommand = new RelayCommand(_ => ActivePopup = _filters);
         ClosePopupCommand = new RelayCommand(_ => ActivePopup = null);
     }
@@ -183,28 +174,11 @@ public class TransactionsViewModel : ViewModelBase
         ActivePopup = picker;
     }
 
-    private void OpenAccountFilter()
-    {
-        var options = new List<string> { "All accounts" };
-        options.AddRange(Accounts);
-        var current = Accounts.FirstOrDefault(a => a.Equals(AccountFilterLabel, StringComparison.OrdinalIgnoreCase)) ?? "All accounts";
-
-        var picker = new ListPickerViewModel("Filter by account", options, current);
-        picker.OptionChosen += label =>
-        {
-            AccountFilterLabel = label.ToLowerInvariant();
-            RecomputeFilteredTransactions();
-            ActivePopup = null;
-        };
-        picker.CloseRequested += () => ActivePopup = null;
-        ActivePopup = picker;
-    }
-
     private void OpenImport(Transaction? editing)
     {
         var form = editing == null
-            ? new ImportTransactionViewModel(Accounts)
-            : new ImportTransactionViewModel(editing, Accounts);
+            ? new ImportTransactionViewModel()
+            : new ImportTransactionViewModel(editing);
 
         form.Submitted += OnTransactionSubmitted;
         form.CloseRequested += () => ActivePopup = null;
@@ -317,9 +291,6 @@ public class TransactionsViewModel : ViewModelBase
 
         if (TypeFilterLabel == "income") query = query.Where(t => t.IsIncome);
         else if (TypeFilterLabel == "expense") query = query.Where(t => !t.IsIncome);
-
-        if (AccountFilterLabel != "all accounts")
-            query = query.Where(t => t.Account.Equals(AccountFilterLabel, StringComparison.OrdinalIgnoreCase));
 
         if (_filters.SelectedCategory != "All")
             query = query.Where(t => t.Category.Equals(_filters.SelectedCategory, StringComparison.OrdinalIgnoreCase));

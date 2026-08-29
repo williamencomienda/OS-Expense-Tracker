@@ -33,8 +33,6 @@ public class ImportTransactionViewModel : ViewModelBase
     public ObservableCollection<string> CategoryOptions { get; } =
         new(CategoryPalette.ExpenseCategories.Select(Capitalize));
 
-    public ObservableCollection<string> AccountOptions { get; }
-
     private string? _selectedMonth;
     public string? SelectedMonth
     {
@@ -68,13 +66,6 @@ public class ImportTransactionViewModel : ViewModelBase
     {
         get => _selectedCategory;
         set => SetField(ref _selectedCategory, value);
-    }
-
-    private string? _selectedAccount;
-    public string? SelectedAccount
-    {
-        get => _selectedAccount;
-        set => SetField(ref _selectedAccount, value);
     }
 
     private bool _isIncome;
@@ -111,10 +102,9 @@ public class ImportTransactionViewModel : ViewModelBase
     private readonly Transaction? _editingTransaction;
 
     // Add mode: blank form.
-    public ImportTransactionViewModel(IEnumerable<string> accounts)
+    public ImportTransactionViewModel()
     {
         Mode = TransactionFormMode.Add;
-        AccountOptions = new ObservableCollection<string>(accounts);
 
         var today = DateTime.Today;
         SelectedMonth = Months[today.Month - 1];
@@ -129,7 +119,7 @@ public class ImportTransactionViewModel : ViewModelBase
     }
 
     // Edit mode: pre-fills every field from an existing transaction, and mutates it in place on submit.
-    public ImportTransactionViewModel(Transaction existing, IEnumerable<string> accounts) : this(accounts)
+    public ImportTransactionViewModel(Transaction existing) : this()
     {
         Mode = TransactionFormMode.Edit;
         _editingTransaction = existing;
@@ -138,7 +128,6 @@ public class ImportTransactionViewModel : ViewModelBase
         SelectedDay = existing.Date.Day;
         SelectedYear = existing.Date.Year;
         Description = existing.Description;
-        SelectedAccount = existing.Account;
         IsIncome = existing.IsIncome;
         SelectedCategory = existing.IsIncome ? null : Capitalize(existing.Category);
         AmountText = existing.Amount.ToString("0.##");
@@ -159,7 +148,6 @@ public class ImportTransactionViewModel : ViewModelBase
         transaction.Date = date;
         transaction.Description = Description;
         transaction.Category = category;
-        transaction.Account = SelectedAccount ?? AccountOptions.FirstOrDefault() ?? string.Empty;
         transaction.IsIncome = IsIncome;
         transaction.Amount = amount;
         transaction.CategoryBrush = CategoryPalette.BrushFor(category);
