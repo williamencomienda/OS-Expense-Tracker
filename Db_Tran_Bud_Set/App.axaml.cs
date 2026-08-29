@@ -39,11 +39,11 @@ public partial class App : Application
             if (!db.Categories.Any())
             {
                 db.Categories.AddRange(
-                    new Category { Name = "Food" },
-                    new Category { Name = "Transport" },
-                    new Category { Name = "Shopping" },
-                    new Category { Name = "Utilities" },
-                    new Category { Name = "Entertainment" }
+                    new Category { Name = "Food", MonthlyBudget = 2000 },
+                    new Category { Name = "Transport", MonthlyBudget = 2000 },
+                    new Category { Name = "Shopping", MonthlyBudget = 2000 },
+                    new Category { Name = "Utilities", MonthlyBudget = 2000 },
+                    new Category { Name = "Entertainment", MonthlyBudget = 2000 }
                 );
                 db.SaveChanges();
             }
