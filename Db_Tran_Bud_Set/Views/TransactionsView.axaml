@@ -101,14 +101,13 @@
         <Border Classes="TableCard">
           <Grid RowDefinitions="Auto,*">
 
-            <Grid Grid.Row="0" Classes="TableHeaderRow" ColumnDefinitions="120,1.6*,110,120,100,110,60">
+            <Grid Grid.Row="0" Classes="TableHeaderRow" ColumnDefinitions="120,1.6*,110,100,110,60">
               <TextBlock Grid.Column="0" Text="date" Classes="TableHeaderText" Margin="16,10" />
               <TextBlock Grid.Column="1" Text="description" Classes="TableHeaderText" Margin="0,10" />
               <TextBlock Grid.Column="2" Text="category" Classes="TableHeaderText" Margin="0,10" />
-              <TextBlock Grid.Column="3" Text="account" Classes="TableHeaderText" Margin="0,10" />
-              <TextBlock Grid.Column="4" Text="type" Classes="TableHeaderText" Margin="0,10" />
-              <TextBlock Grid.Column="5" Text="amount" Classes="TableHeaderText" Margin="0,10" HorizontalAlignment="Right" />
-              <TextBlock Grid.Column="6" Text="action" Classes="TableHeaderText" Margin="0,10,16,10" HorizontalAlignment="Center" />
+              <TextBlock Grid.Column="3" Text="type" Classes="TableHeaderText" Margin="0,10" />
+              <TextBlock Grid.Column="4" Text="amount" Classes="TableHeaderText" Margin="0,10" HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="5" Text="action" Classes="TableHeaderText" Margin="0,10,16,10" HorizontalAlignment="Center" />
             </Grid>
 
             <!-- Scrollable once there are more than ~5 rows (placeholder data only has a few). -->
@@ -116,8 +115,8 @@
               <ItemsControl ItemsSource="{Binding FilteredTransactions}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="models:Transaction">
-                    <Grid ColumnDefinitions="120,1.6*,110,120,100,110,60">
-                      <Border Grid.ColumnSpan="7" BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1" />
+                    <Grid ColumnDefinitions="120,1.6*,110,100,110,60">
+                      <Border Grid.ColumnSpan="6" BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1" />
 
                       <TextBlock Grid.Column="0" Text="{Binding DisplayDate}" Foreground="White" FontSize="13"
                                  Margin="16,14" VerticalAlignment="Center" />
@@ -129,20 +128,18 @@
                         <TextBlock Text="{Binding Category}" FontSize="12" Foreground="{Binding CategoryBrush}" />
                       </Border>
 
-                      <TextBlock Grid.Column="3" Text="{Binding Account}" Foreground="White" FontSize="13" VerticalAlignment="Center" />
-
-                      <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                      <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                         <TextBlock Text="{Binding TypeGlyph}" FontSize="12" Classes="AmountText"
                                    Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
                         <TextBlock Text="{Binding TypeLabel}" FontSize="13" Classes="AmountText"
                                    Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
                       </StackPanel>
 
-                      <TextBlock Grid.Column="5" Text="{Binding DisplayAmount}" FontSize="13"
+                      <TextBlock Grid.Column="4" Text="{Binding DisplayAmount}" FontSize="13"
                                  HorizontalAlignment="Right" VerticalAlignment="Center"
                                  Classes="AmountText" Classes.Expense="{Binding IsExpense}" Classes.Income="{Binding IsIncome}" />
 
-                      <Button Grid.Column="6" Classes="DotsButton" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,16,0">
+                      <Button Grid.Column="5" Classes="DotsButton" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,16,0">
                         <StackPanel Spacing="3" HorizontalAlignment="Center">
                           <Ellipse Width="4" Height="4" Fill="{StaticResource TextMutedBrush}" />
                           <Ellipse Width="4" Height="4" Fill="{StaticResource TextMutedBrush}" />
