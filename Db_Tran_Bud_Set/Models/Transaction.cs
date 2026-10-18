@@ -28,8 +28,13 @@ public class Transaction
     public ICommand? EditCommand { get; set; }
     public ICommand? RemoveCommand { get; set; }
 
+<<<<<<< HEAD
     public string DisplayDate => DateDisplay.Format(Date);
     public string DisplayAmount => $"\u20B1{Amount:N2}";
+=======
+    public string DisplayDate => Date.ToString("MMMM d, yyyy");
+    public string DisplayAmount => $"{CurrencySettings.Symbol}{Amount:N2}";
+>>>>>>> aca74e78d5c74ff07a054c98edf4229091b55b1c
     public string TypeLabel => IsIncome ? "income" : "expense";
     public string TypeGlyph => IsIncome ? "^" : "v";
     public bool IsExpense => !IsIncome;
