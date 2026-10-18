@@ -14,6 +14,6 @@ public class TransactionItem
     public bool IsExpense => Amount < 0;
     public bool IsIncome => Amount >= 0;
 
-    public string DisplayAmount => (IsExpense ? "- \u20B1" : "+ \u20B1") + System.Math.Abs(Amount).ToString("N2");
-    public string DisplayDate => Date.ToString("MMMM d, yyyy");
+    public string DisplayAmount => (IsExpense ? "- " : "+ ") + CurrencySettings.Symbol + System.Math.Abs(Amount).ToString("N2");
+    public string DisplayDate => DateDisplay.Format(Date);
 }

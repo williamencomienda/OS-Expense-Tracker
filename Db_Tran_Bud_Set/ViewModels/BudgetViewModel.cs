@@ -111,7 +111,7 @@ public class BudgetViewModel : ViewModelBase
                 Alerts.Add(new BudgetAlert
                 {
                     Label = $"{category.Name} over limit",
-                    BadgeText = $"+\u20B1{(spent - limit):N0}",
+                    BadgeText = $"+{CurrencySettings.Symbol}{(spent - limit):N0}",
                     Severity = AlertSeverity.OverLimit
                 });
             }
@@ -142,19 +142,19 @@ public class BudgetViewModel : ViewModelBase
         SummaryCards.Add(new BudgetSummaryCard
         {
             Title = "total budget",
-            DisplayAmount = $"\u20B1{totalBudget:N2}",
+            DisplayAmount = $"{CurrencySettings.Symbol}{totalBudget:N2}",
             Subtitle = $"across {budgetedCategories.Count} categories"
         });
         SummaryCards.Add(new BudgetSummaryCard
         {
             Title = "total spent",
-            DisplayAmount = $"\u20B1{totalSpent:N2}",
+            DisplayAmount = $"{CurrencySettings.Symbol}{totalSpent:N2}",
             Subtitle = $"{percentUsed:P1} of budget used"
         });
         SummaryCards.Add(new BudgetSummaryCard
         {
             Title = "remaining",
-            DisplayAmount = $"\u20B1{remaining:N2}",
+            DisplayAmount = $"{CurrencySettings.Symbol}{remaining:N2}",
             Subtitle = remaining >= 0 ? "on track" : "over budget"
         });
     }

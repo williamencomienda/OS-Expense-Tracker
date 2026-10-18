@@ -13,5 +13,5 @@ public class ExpenseSlice
 
     public IBrush Color { get; set; } = Brushes.HotPink;
 
-    public string DisplayAmount => $"\u20B1{Amount:N0} ({Percent:P0})";
+    public string DisplayAmount => $"{CurrencySettings.Symbol}{Amount:N0} ({Percent:P0})";
 }
