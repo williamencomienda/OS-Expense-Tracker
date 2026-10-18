@@ -20,10 +20,10 @@ public class BudgetViewModel : ViewModelBase
     private readonly ICategoryRepository _categoryRepository;
     private readonly IBudgetService _budgetService;
 
-    private int _currentMonth = 8;
-    private int _currentYear = 2026;
+    private int _currentMonth = DateTime.Today.Month;
+    private int _currentYear = DateTime.Today.Year;
 
-    private string _headerMonthLabel = "August 2026";
+    private string _headerMonthLabel = $"{MonthNames[DateTime.Today.Month - 1]} {DateTime.Today.Year}";
     public string HeaderMonthLabel
     {
         get => _headerMonthLabel;

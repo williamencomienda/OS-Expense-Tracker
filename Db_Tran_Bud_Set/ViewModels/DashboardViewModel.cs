@@ -31,7 +31,7 @@ public class DashboardViewModel : ViewModelBase
     private readonly IBudgetService _budgetService;
 
     // ----- Header -----
-    private string _headerMonthLabel = "August 2026";
+    private string _headerMonthLabel = $"{MonthNames[DateTime.Today.Month - 1]} {DateTime.Today.Year}";
     public string HeaderMonthLabel
     {
         get => _headerMonthLabel;
@@ -46,8 +46,8 @@ public class DashboardViewModel : ViewModelBase
     }
 
     // ----- Currently selected period -----
-    private int _currentMonth = 8;
-    private int _currentYear = 2026;
+    private int _currentMonth = DateTime.Today.Month;
+    private int _currentYear = DateTime.Today.Year;
 
     // ----- Data collections -----
     public ObservableCollection<SummaryCard> SummaryCards { get; } = new();
