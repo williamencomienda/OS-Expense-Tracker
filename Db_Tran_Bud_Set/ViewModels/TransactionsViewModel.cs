@@ -266,8 +266,7 @@ public class TransactionsViewModel : ViewModelBase
         else
             await _expenseRepository.DeleteAsync(transaction.DbId);
 
-        AllTransactions.Remove(transaction);
-        RecomputeFilteredTransactions();
+        await LoadTransactionsAsync();
         DataChanged?.Invoke();
     }
 
