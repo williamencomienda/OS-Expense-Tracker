@@ -28,7 +28,7 @@ public class Transaction
     public ICommand? EditCommand { get; set; }
     public ICommand? RemoveCommand { get; set; }
 
-    public string DisplayDate => Date.ToString("MMMM d, yyyy");
+    public string DisplayDate => DateDisplay.Format(Date);
     public string DisplayAmount => $"{CurrencySettings.Symbol}{Amount:N2}";
     public string TypeLabel => IsIncome ? "income" : "expense";
     public string TypeGlyph => IsIncome ? "^" : "v";

@@ -1,15 +1,21 @@
-namespace GCAT.Models;
+   using System;
 
-// Holds the currency symbol chosen in Settings so plain model classes (like Transaction)
-// can format amounts without a reference to SettingsViewModel.
-public static class CurrencySettings
-{
-    public static string Symbol { get; private set; } = "\u20B1"; // ₱ by default
+   namespace GCAT.Models;
 
-    // Accepts a stored label such as "₱ PHP" or "$ USD/CAD" and keeps just the symbol.
-    public static void SetFromLabel(string label)
-    {
-        if (string.IsNullOrWhiteSpace(label)) return;
-        Symbol = label.Trim().Split(' ')[0];
-    }
-}
+   public static class CurrencySettings
+   {
+       public static string Symbol { get; private set; } = "\u20B1";
+
+       public static event Action? Changed;
+
+       public static void SetFromLabel(string label)
+       {
+           if (string.IsNullOrWhiteSpace(label)) return;
+
+           var symbol = label.Trim().Split(' ')[0];
+           if (symbol == Symbol) return;
+
+           Symbol = symbol;
+           Changed?.Invoke();
+       }
+   }

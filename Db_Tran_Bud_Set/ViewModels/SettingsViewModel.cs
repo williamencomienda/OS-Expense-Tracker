@@ -1,6 +1,7 @@
 using GCAT.Models;
 
 namespace GCAT.ViewModels;
+using GCAT.Models;
 
 public class SettingsViewModel : ViewModelBase
 {
@@ -16,7 +17,7 @@ public class SettingsViewModel : ViewModelBase
         }
     }
 
-    private string _dateFormat = "MMM DD, YYYY";
+    private string _dateFormat = DateDisplay.Pattern;
     public string DateFormat
     {
         get => _dateFormat;
@@ -59,6 +60,7 @@ public class SettingsViewModel : ViewModelBase
         picker.FormatChosen += pattern =>
         {
             DateFormat = pattern;
+            DateDisplay.Set(pattern);
             ActivePopup = null;
         };
         picker.CloseRequested += () => ActivePopup = null;

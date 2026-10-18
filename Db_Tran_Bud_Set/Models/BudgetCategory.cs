@@ -29,7 +29,7 @@ public class BudgetCategory : ViewModelBase
 
     public bool IsOverBudget => Spent > Limit;
 
-    public string DisplayAmount => $"\u20B1{Spent:N0}/\u20B1{Limit:N0}";
+    public string DisplayAmount => $"{CurrencySettings.Symbol}{Spent:N0}/{CurrencySettings.Symbol}{Limit:N0}";
 
     public string DisplayPercent => IsOverBudget
         ? $"{PercentUsed:N0}% - over budget"

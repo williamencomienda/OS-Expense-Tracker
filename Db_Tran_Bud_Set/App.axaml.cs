@@ -12,6 +12,7 @@ using ExpenseTracker.Core.Services;
 using ExpenseTracker.Core.Models;
 using GCAT.ViewModels;
 using GCAT.Views;
+using GCAT.Models;
 
 namespace GCAT;
 
@@ -26,6 +27,8 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        DateDisplay.Load();
+        
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();

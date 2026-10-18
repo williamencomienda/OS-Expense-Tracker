@@ -10,7 +10,7 @@ public class SummaryCard
     public double ChangePercent { get; set; }
     public bool IsPositiveChange { get; set; }
 
-    public string DisplayAmount => $"\u20B1{Amount:N2}";
+    public string DisplayAmount => $"{CurrencySettings.Symbol}{Amount:N2}";
     public string ChangeArrow => IsPositiveChange ? "\u2197" : "\u2198";
     public string DisplayChange => $"{ChangeArrow} {Math.Abs(ChangePercent):N0}% from last month";
 }

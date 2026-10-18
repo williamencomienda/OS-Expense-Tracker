@@ -7,5 +7,5 @@ public class BudgetItem
     public decimal Limit { get; set; }
 
     public double Progress => Limit <= 0 ? 0 : (double)(Spent / Limit);
-    public string DisplayLabel => $"\u20B1{Spent:N0}/\u20B1{Limit:N0}";
+    public string DisplayLabel => $"{CurrencySettings.Symbol}{Spent:N0}/{CurrencySettings.Symbol}{Limit:N0}";
 }

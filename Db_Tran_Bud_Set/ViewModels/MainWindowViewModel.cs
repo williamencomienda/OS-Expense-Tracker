@@ -53,6 +53,13 @@ public class MainWindowViewModel : ViewModelBase
 
         _currentPage = Dashboard;
         SelectedNavItem = NavItems[0];
+
+        CurrencySettings.Changed += async () =>
+        {
+            await Dashboard.LoadDashboardDataAsync();
+            await Transactions.LoadTransactionsAsync();
+            await Budget.LoadBudgetDataAsync();
+        };
     }
 
     private void UpdateCurrentPage()

@@ -27,7 +27,7 @@ public class TransactionsViewModel : ViewModelBase
     public ObservableCollection<Transaction> AllTransactions { get; } = new();
     public ObservableCollection<Transaction> FilteredTransactions { get; } = new();
 
-    private string _headerMonthLabel = "August 2026";
+    private string _headerMonthLabel = $"{MonthNames[DateTime.Today.Month - 1]} {DateTime.Today.Year}";
     public string HeaderMonthLabel
     {
         get => _headerMonthLabel;
@@ -85,7 +85,7 @@ public class TransactionsViewModel : ViewModelBase
         _incomeRepository = incomeRepository;
         _categoryRepository = categoryRepository;
 
-        _monthPicker = new MonthPickerViewModel(2026, 8);
+        _monthPicker = new MonthPickerViewModel(DateTime.Today.Year, DateTime.Today.Month);
         _monthPicker.MonthChosen += (year, month) =>
         {
             HeaderMonthLabel = $"{MonthNames[month - 1]} {year}";
@@ -105,6 +105,7 @@ public class TransactionsViewModel : ViewModelBase
         OpenTypeFilterCommand = new RelayCommand(_ => OpenTypeFilter());
         OpenFiltersCommand = new RelayCommand(_ => ActivePopup = _filters);
         ClosePopupCommand = new RelayCommand(_ => ActivePopup = null);
+        DateDisplay.Changed += RecomputeFilteredTransactions; // For date
     }
 
     // Call this right after construction (constructors can't be async)
