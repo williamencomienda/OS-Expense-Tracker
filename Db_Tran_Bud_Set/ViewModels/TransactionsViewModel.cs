@@ -105,6 +105,7 @@ public class TransactionsViewModel : ViewModelBase
         OpenTypeFilterCommand = new RelayCommand(_ => OpenTypeFilter());
         OpenFiltersCommand = new RelayCommand(_ => ActivePopup = _filters);
         ClosePopupCommand = new RelayCommand(_ => ActivePopup = null);
+        DateDisplay.Changed += RecomputeFilteredTransactions; // For date
     }
 
     // Call this right after construction (constructors can't be async)
