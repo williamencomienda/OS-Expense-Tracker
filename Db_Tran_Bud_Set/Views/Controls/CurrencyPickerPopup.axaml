@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GCAT.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GCAT.Views.Controls.CurrencyPickerPopup"
+             x:DataType="vm:CurrencyPickerViewModel"
+             Width="460">
+
+  <Border Classes="PopupCard">
+    <StackPanel Spacing="18">
+
+      <!-- drag handle -->
+      <Border Width="60" Height="5" CornerRadius="3" Background="#4A2C3A" HorizontalAlignment="Center" />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White" />
+        <Button Grid.Column="1" Classes="IconButton" Command="{Binding CloseCommand}">
+          <TextBlock Text="&#10005;" FontSize="16" Foreground="White" />
+        </Button>
+      </Grid>
+
+      <ItemsControl ItemsSource="{Binding Options}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:CurrencyOption">
+            <StackPanel>
+              <Button Classes="SettingsRow" Command="{Binding SelectCommand}">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,12">
+                  <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="15" Foreground="White"
+                             VerticalAlignment="Center" />
+                </Grid>
+              </Button>
+              <Border BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1" Opacity="0.4" />
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+    </StackPanel>
+  </Border>
+</UserControl>
