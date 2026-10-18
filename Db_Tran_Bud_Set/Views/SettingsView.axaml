@@ -39,13 +39,17 @@
             <StackPanel>
               <TextBlock Text="preferences" FontSize="17" FontWeight="Bold" Foreground="White" Margin="0,0,0,16" />
 
-              <!-- Display currency: plain text, not clickable -->
-              <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" Text="display currency" FontSize="15" Foreground="White"
-                           VerticalAlignment="Center" />
-                <TextBlock Grid.Column="1" Text="{Binding DisplayCurrency}" FontSize="15"
-                           FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
-              </Grid>
+              <!-- Display currency: clickable, opens popup -->
+              <Button Classes="SettingsRow" Command="{Binding OpenCurrencyPickerCommand}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="display currency" FontSize="15" Foreground="White"
+                             VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding DisplayCurrency}" FontSize="15" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="&#9662;" FontSize="12" Foreground="{StaticResource PinkBorderBrush}" />
+                  </StackPanel>
+                </Grid>
+              </Button>
               <Border BorderBrush="{StaticResource TableBorderBrush}" BorderThickness="0,0,0,1"
                       Opacity="0.4" Margin="0,14" />
 
@@ -92,6 +96,9 @@
         <ContentControl.DataTemplates>
           <DataTemplate DataType="vm:DateFormatPickerViewModel">
             <controls:DateFormatPickerPopup />
+          </DataTemplate>
+          <DataTemplate DataType="vm:CurrencyPickerViewModel">
+            <controls:CurrencyPickerPopup />
           </DataTemplate>
         </ContentControl.DataTemplates>
       </ContentControl>
